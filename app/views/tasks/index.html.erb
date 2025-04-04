@@ -1,0 +1,46 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Tasks" %>
+
+<h1>Was gibt es alles zu tun?</h1>
+
+
+<%
+=begin%>
+ <div id="tasks">
+  <% @tasks.each do |task| %>
+    <%= render task %>
+    <p>
+      <%= link_to "Show this task", task %>
+    </p>
+  <% end %>
+</div> 
+<%
+=end%>
+
+<table>
+  <thead>
+    <tr>
+      <th>Titel</th>
+      <th>Category</th>
+      <th>Entity</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @tasks.each do |task| %>
+      <tr>
+        <td><%= link_to task.title, task %></td>
+        <!-- Display the category name instead of its ID -->
+        <td><%= task.category.name if task.category %></td>
+        <!-- If you want to display the entity name as well -->
+        <td><%= task.entity.name if task.entity %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+
+<%= link_to "Neues ToDo", new_task_path %>
+<%= link_to "Tags", categories_path %>
+<%= link_to "Gliederungen", entities_path %>
