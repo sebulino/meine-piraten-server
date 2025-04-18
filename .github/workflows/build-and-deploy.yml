@@ -82,9 +82,15 @@ jobs:
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
 
-        # Create and push the new tag
-        git tag "${{ env.VERSION }}" -m "ci: release version ${{ env.VERSION }}"
-        git push origin "${{ env.VERSION }}"
+        # Create and push the new tag if minor or major
+        # Check commit message for [major] or [minor]
+        if [[ "${{ github.event.head_commit.message }}" =~ \[major\] ]]; then
+          git tag "${{ env.VERSION }}" -m "ci: release version ${{ env.VERSION }}"
+          git push origin "${{ env.VERSION }}"
+        elif [[ "${{ github.event.head_commit.message }}" =~ \[minor\] ]]; then
+          git tag "${{ env.VERSION }}" -m "ci: release version ${{ env.VERSION }}"
+          git push origin "${{ env.VERSION }}"
+        fi
 
     - name: Install SSH keys
       # Check this thread to understand why it's needed:
