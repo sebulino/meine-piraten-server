@@ -83,8 +83,8 @@ jobs:
         git config user.email "github-actions[bot]@users.noreply.github.com"
 
         # Create and push the new tag
-        # git tag "${{ env.VERSION }}" -m "ci: release version ${{ env.VERSION }}"
-        # git push origin "${{ env.VERSION }}"
+        git tag "${{ env.VERSION }}" -m "ci: release version ${{ env.VERSION }}"
+        git push origin "${{ env.VERSION }}"
 
     - name: Install SSH keys
       # Check this thread to understand why it's needed:
