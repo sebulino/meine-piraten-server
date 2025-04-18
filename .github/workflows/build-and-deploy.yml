@@ -1,0 +1,96 @@
+name: Build, tag and deploy
+
+on:
+  push:
+    branches: [ "master" ]
+
+permissions:
+  contents: write   # allows pushing Git tags
+  packages: write   # allows pushing to GHCR
+
+jobs:
+  build:
+    name: Build and tag Docker image
+    runs-on: self-hosted
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Determine next version from last tag
+      id: semver
+      run: |
+        # Fetch all tags (sometimes needed explicitly)
+        git fetch --tags --prune
+
+        # Get the latest tag, or 0.0.0 if none
+        LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+        echo "Latest tag: $LATEST_TAG"
+
+        MAJOR=$(echo "$LATEST_TAG" | cut -d '.' -f 1)
+        MINOR=$(echo "$LATEST_TAG" | cut -d '.' -f 2)
+        PATCH=$(echo "$LATEST_TAG" | cut -d '.' -f 3)
+
+        NEXT_MAJOR=$MAJOR
+        NEXT_MINOR=$MINOR
+        NEXT_PATCH=$((PATCH + 1))
+
+        # Check commit message for [major] or [minor]
+        if [[ "${{ github.event.head_commit.message }}" =~ \[major\] ]]; then
+          NEXT_MAJOR=$((MAJOR + 1))
+          NEXT_MINOR=0
+          NEXT_PATCH=0
+        elif [[ "${{ github.event.head_commit.message }}" =~ \[minor\] ]]; then
+          NEXT_MINOR=$((MINOR + 1))
+          NEXT_PATCH=0
+        fi
+
+        NEXT_VERSION="${NEXT_MAJOR}.${NEXT_MINOR}.${NEXT_PATCH}"
+        echo "Computed next version: $NEXT_VERSION"
+
+        # Export variables
+        echo "VERSION=$NEXT_VERSION" >> $GITHUB_ENV
+        echo "MAJOR=$NEXT_MAJOR" >> $GITHUB_ENV
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2 
+    - name: Build Docker image
+      run: |
+        docker build -t meine-piraten-server:build -f Dockerfile .
+    - name: Tag Docker image
+      run: |
+        echo "Tagging image with version ${{ env.VERSION }} ..."
+        docker tag meine-piraten-server:build ghcr.io/${{ github.repository }}:${{ env.VERSION }}
+        docker tag meine-piraten-server:build ghcr.io/${{ github.repository }}:v${{ env.MAJOR }}
+        docker tag meine-piraten-server:build ghcr.io/${{ github.repository }}
+
+    - name: Login to GitHub Container Registry
+      if: always()
+      run: |
+        echo "${{ secrets.PAT }}" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+
+    - name: Push Docker image
+      run: |
+        docker push ghcr.io/${{ github.repository }}:${{ env.VERSION }}
+        docker push ghcr.io/${{ github.repository }}:v${{ env.MAJOR }}
+        docker push ghcr.io/${{ github.repository }}
+
+    - name: Push new Git tag
+      run: |
+        # Configure Git
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+        # Create and push the new tag
+        # git tag "${{ env.VERSION }}" -m "ci: release version ${{ env.VERSION }}"
+        # git push origin "${{ env.VERSION }}"
+
+    - name: Install SSH keys
+      # Check this thread to understand why it's needed:
+      # https://stackoverflow.com/a/70447517
+      run: |
+        install -m 600 -D /dev/null ~/.ssh/id_rsa
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+    - name: Connect and pull
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "docker compose up -d staging"
