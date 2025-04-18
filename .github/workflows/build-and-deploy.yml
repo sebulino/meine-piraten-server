@@ -3,7 +3,7 @@ name: Build, tag and deploy
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "update" ]
 
 permissions:
   contents: write   # allows pushing Git tags
