@@ -1,4 +1,5 @@
 name: Build, tag and deploy
+# https://www.programonaut.com/how-to-deploy-a-git-repository-to-a-server-using-github-actions/
 
 on:
   push:
@@ -93,4 +94,4 @@ jobs:
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
     - name: Connect and pull
-      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "docker compose up -d staging"
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "docker compose up -d prod"
