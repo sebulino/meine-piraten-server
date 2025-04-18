@@ -22,8 +22,9 @@
   <thead>
     <tr>
       <th>Titel</th>
-      <th>Category</th>
-      <th>Entity</th>
+      <th>Kategorie</th>
+      <th>Gliederung</th>
+      <th>Aufwand (Stunden)</th>
     </tr>
   </thead>
 
@@ -35,6 +36,7 @@
         <td><%= task.category.name if task.category %></td>
         <!-- If you want to display the entity name as well -->
         <td><%= task.entity.name if task.entity %></td>
+        <td><%= task.time_needed_in_hours %></td>
       </tr>
     <% end %>
   </tbody>
