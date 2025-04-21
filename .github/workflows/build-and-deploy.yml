@@ -54,7 +54,7 @@ jobs:
         echo "VERSION=$NEXT_VERSION" >> $GITHUB_ENV
         echo "MAJOR=$NEXT_MAJOR" >> $GITHUB_ENV
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2 
+      uses: docker/setup-buildx-action@v3 
     - name: Build Docker image
       run: |
         docker build -t meine-piraten-server:build -f Dockerfile .
