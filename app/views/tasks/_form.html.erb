@@ -37,8 +37,18 @@
   </div>
 
   <div>
+    <%= form.label :due_date, style: "display: block" %>
+    <%= form.date_field :due_date %>
+  </div>
+
+  <div>
     <%= form.label :activity_points, style: "display: block" %>
     <%= form.number_field :activity_points %>
+  </div>
+
+  <div>
+    <%= form.label :is_urgent, style: "display: block" %>
+    <%= form.checkbox :is_urgent %>
   </div>
 
   <!-- Dropdown for Category -->

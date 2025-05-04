@@ -25,6 +25,7 @@
       <th>Kategorie</th>
       <th>Gliederung</th>
       <th>Aufwand (Stunden)</th>
+      <th>bis</th>
     </tr>
   </thead>
 
@@ -37,6 +38,7 @@
         <!-- If you want to display the entity name as well -->
         <td><%= task.entity.name if task.entity %></td>
         <td><%= task.time_needed_in_hours %></td>
+        <td><%= task.due_date %></td>
       </tr>
     <% end %>
   </tbody>
@@ -44,5 +46,5 @@
 
 
 <%= link_to "Neues ToDo", new_task_path %>
-<%= link_to "Tags", categories_path %>
+<%= link_to "Kategorien", categories_path %>
 <%= link_to "Gliederungen", entities_path %>
