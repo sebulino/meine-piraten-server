@@ -2,7 +2,7 @@ class TasksController < ApplicationController
   before_action :set_task, only: %i[ show edit update destroy ]
 
   def task_params
-    params.require(:task).permit(:title, :description, :category_id, :entity_id)
+    params.require(:task).permit(:title, :description, :completed, :category_id, :entity_id)
   end
 
   # GET /tasks or /tasks.json
@@ -40,6 +40,9 @@ class TasksController < ApplicationController
 
   # PATCH/PUT /tasks/1 or /tasks/1.json
   def update
+    print("**************** PARAMS ************\n")
+    print(task_params)
+    print("*****************************************\n")
     respond_to do |format|
       if @task.update(task_params)
         format.html { redirect_to @task, notice: "Task was successfully updated." }
@@ -69,6 +72,6 @@ class TasksController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def task_params
-      params.expect(task: [ :title, :description, :completed, :creator_name, :time_needed_in_hours, :activity_points, :category_id, :entity_id ])
+      params.expect(task: [ :title, :description, :completed, :creator_name, :time_needed_in_hours, :due_date, :activity_points, :is_urgent, :category_id, :entity_id ])
     end
 end
