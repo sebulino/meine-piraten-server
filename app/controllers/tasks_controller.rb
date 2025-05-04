@@ -40,9 +40,6 @@ class TasksController < ApplicationController
 
   # PATCH/PUT /tasks/1 or /tasks/1.json
   def update
-    print("**************** PARAMS ************\n")
-    print(task_params)
-    print("*****************************************\n")
     respond_to do |format|
       if @task.update(task_params)
         format.html { redirect_to @task, notice: "Task was successfully updated." }
