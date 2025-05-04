@@ -39,7 +39,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_04_111715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.date "due_date"
-    t.boolean "is_urgent"
+    t.boolean "urgent"
     t.index ["category_id"], name: "index_tasks_on_category_id"
     t.index ["entity_id"], name: "index_tasks_on_entity_id"
   end
