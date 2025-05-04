@@ -4,14 +4,32 @@
 
 <h1>Entities</h1>
 
-<div id="entities">
-  <% @entities.each do |entity| %>
-    <%= render entity %>
-    <p>
-      <%= link_to "Show this entity", entity %>
-    </p>
-  <% end %>
-</div>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>LV</th>
+      <th>OV</th>
+      <th>AKV</th>
+      <th>Nummer</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @entities.each do |entity| %>
+      <tr>
+        <td><%= link_to entity.name, entity %></td>
+        <!-- Display the category name instead of its ID -->
+        <td><%= entity.LV  %></td>
+        <!-- If you want to display the entity name as well -->
+        <td><%= entity.OV  %></td>
+        <td><%= entity.KV %></td>
+        <td><%= entity.entity_id %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
 
 <%= link_to "New entity", new_entity_path %>
 </br>
