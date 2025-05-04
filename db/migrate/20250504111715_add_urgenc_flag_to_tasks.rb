@@ -1,5 +1,5 @@
 class AddUrgencFlagToTasks < ActiveRecord::Migration[8.0]
   def change
-    add_column :tasks, :is_urgent, :boolean
+    add_column :tasks, :urgent, :boolean
   end
 end
