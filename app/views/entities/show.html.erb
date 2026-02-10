@@ -3,9 +3,9 @@
 <%= render @entity %>
 
 <div>
-  <%= link_to "Edit this entity", edit_entity_path(@entity) %> |
-  <%= link_to "Back to entities", entities_path %>
+  <%= link_to "Bearbeiten", edit_entity_path(@entity) %> |
+  <%= link_to "Zurück zur Liste", entities_path %>
 
-  <%= button_to "Destroy this entity", @entity, method: :delete %>
+  <%= button_to "Löschen", @entity, method: :delete %>
 </div>
-<%= link_to "Home", tasks_path %>
+<%= link_to "Startseite", tasks_path %>

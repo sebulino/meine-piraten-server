@@ -5,23 +5,25 @@
   </p>
 
   <p>
-    <strong>Lv:</strong>
-    <%= entity.LV %>
+    <strong>Landesverband (LV):</strong>
+    <%= entity.LV ? "Ja" : "Nein" %>
   </p>
 
   <p>
-    <strong>Ov:</strong>
-    <%= entity.OV %>
+    <strong>Ortsverband (OV):</strong>
+    <%= entity.OV ? "Ja" : "Nein" %>
   </p>
 
   <p>
-    <strong>Kv:</strong>
-    <%= entity.KV %>
+    <strong>Kreisverband (KV):</strong>
+    <%= entity.KV ? "Ja" : "Nein" %>
   </p>
 
-  <p>
-    <strong>Entity:</strong>
-    <%= entity.entity_id %>
-  </p>
+  <% if entity.entity_id.present? %>
+    <p>
+      <strong>Übergeordnete Gliederung:</strong>
+      <%= Entity.find_by(id: entity.entity_id)&.name || entity.entity_id %>
+    </p>
+  <% end %>
 
 </div>

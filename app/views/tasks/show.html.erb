@@ -2,10 +2,20 @@
 
 <%= render @task %>
 
-<div>
-  <%= link_to "Edit this task", edit_task_path(@task) %> |
-  <%= link_to "Back to tasks", tasks_path %>
+<% if @task.comments.any? %>
+  <h3>Kommentare</h3>
+  <% @task.comments.order(created_at: :asc).each do |comment| %>
+    <div style="margin-bottom: 8px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+      <strong><%= comment.author_name %></strong>
+      <small>(<%= comment.created_at.strftime("%d.%m.%Y %H:%M") %>)</small>
+      <p><%= comment.text %></p>
+    </div>
+  <% end %>
+<% end %>
 
-  <%= button_to "Destroy this task", @task, method: :delete %>
+<div>
+  <%= link_to "Bearbeiten", edit_task_path(@task) %> |
+  <%= link_to "Zurück zur Liste", tasks_path %>
+
+  <%= button_to "Löschen", @task, method: :delete %>
 </div>
-<%= link_to "Home", tasks_path %>

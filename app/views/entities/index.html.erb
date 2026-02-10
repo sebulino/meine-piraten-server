@@ -1,8 +1,8 @@
 <p style="color: green"><%= notice %></p>
 
-<% content_for :title, "Entities" %>
+<% content_for :title, "Gliederungen" %>
 
-<h1>Entities</h1>
+<h1>Gliederungen</h1>
 
 <table>
   <thead>
@@ -10,8 +10,8 @@
       <th>Name</th>
       <th>LV</th>
       <th>OV</th>
-      <th>AKV</th>
-      <th>Nummer</th>
+      <th>KV</th>
+      <th>Übergeordnete Gliederung</th>
     </tr>
   </thead>
 
@@ -19,18 +19,16 @@
     <% @entities.each do |entity| %>
       <tr>
         <td><%= link_to entity.name, entity %></td>
-        <!-- Display the category name instead of its ID -->
-        <td><%= entity.LV  %></td>
-        <!-- If you want to display the entity name as well -->
-        <td><%= entity.OV  %></td>
-        <td><%= entity.KV %></td>
-        <td><%= entity.entity_id %></td>
+        <td><%= entity.LV ? "Ja" : "" %></td>
+        <td><%= entity.OV ? "Ja" : "" %></td>
+        <td><%= entity.KV ? "Ja" : "" %></td>
+        <td><%= Entity.find_by(id: entity.entity_id)&.name %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
 
 
-<%= link_to "New entity", new_entity_path %>
-</br>
-<%= link_to "Home", tasks_path %>
+<%= link_to "Neue Gliederung", new_entity_path %>
+<br>
+<%= link_to "Startseite", tasks_path %>
