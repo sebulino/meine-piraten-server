@@ -1,7 +1,7 @@
 <%= form_with(model: task) do |form| %>
   <% if task.errors.any? %>
     <div style="color: red">
-      <h2><%= pluralize(task.errors.count, "error") %> prohibited this task from being saved:</h2>
+      <h2><%= pluralize(task.errors.count, "Fehler") %> beim Speichern:</h2>
 
       <ul>
         <% task.errors.each do |error| %>
@@ -12,55 +12,58 @@
   <% end %>
 
   <div>
-    <%= form.label :title, style: "display: block" %>
+    <%= form.label :title, "Titel", style: "display: block" %>
     <%= form.text_field :title %>
   </div>
 
   <div>
-    <%= form.label :description, style: "display: block" %>
+    <%= form.label :description, "Beschreibung", style: "display: block" %>
     <%= form.textarea :description %>
   </div>
 
   <div>
-    <%= form.label :completed, style: "display: block" %>
-    <%= form.checkbox :completed %>
-  </div>
-
-  <div>
-    <%= form.label :creator_name, style: "display: block" %>
+    <%= form.label :creator_name, "Erstellt von", style: "display: block" %>
     <%= form.text_field :creator_name %>
   </div>
 
   <div>
-    <%= form.label :time_needed_in_hours, style: "display: block" %>
-    <%= form.number_field :time_needed_in_hours %>
+    <%= form.label :status, "Status", style: "display: block" %>
+    <%= form.select :status, [["Offen", "open"], ["Übernommen", "claimed"], ["Erledigt", "done"]] %>
   </div>
 
   <div>
-    <%= form.label :due_date, style: "display: block" %>
+    <%= form.label :assignee, "Zugewiesen an", style: "display: block" %>
+    <%= form.text_field :assignee %>
+  </div>
+
+  <div>
+    <%= form.label :urgent, "Dringend", style: "display: block" %>
+    <%= form.checkbox :urgent %>
+  </div>
+
+  <div>
+    <%= form.label :due_date, "Fällig bis", style: "display: block" %>
     <%= form.date_field :due_date %>
   </div>
 
   <div>
-    <%= form.label :activity_points, style: "display: block" %>
-    <%= form.number_field :activity_points %>
+    <%= form.label :time_needed_in_hours, "Zeitaufwand (Stunden)", style: "display: block" %>
+    <%= form.number_field :time_needed_in_hours %>
   </div>
 
   <div>
-    <%= form.label :urgent, style: "display: block" %>
-    <%= form.checkbox :urgent %>
+    <%= form.label :activity_points, "Aktivitätspunkte", style: "display: block" %>
+    <%= form.number_field :activity_points %>
   </div>
 
-  <!-- Dropdown for Category -->
   <div class="field">
-    <%= form.label :category_id, "Category" %>
-    <%= form.collection_select(:category_id, Category.all, :id, :name, prompt: "Select a Category") %>
+    <%= form.label :category_id, "Kategorie" %>
+    <%= form.collection_select(:category_id, Category.all, :id, :name, prompt: "Kategorie wählen") %>
   </div>
-  
-  <!-- Dropdown for Entity -->
+
   <div class="field">
-    <%= form.label :entity_id, "Entity" %>
-    <%= form.collection_select(:entity_id, Entity.all, :id, :name, prompt: "Select an Entity") %>
+    <%= form.label :entity_id, "Gliederung" %>
+    <%= form.collection_select(:entity_id, Entity.all, :id, :name, prompt: "Gliederung wählen") %>
   </div>
 
   <div>

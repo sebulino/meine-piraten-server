@@ -1,51 +1,73 @@
 <div id="<%= dom_id task %>">
   <p>
-    <strong>Title:</strong>
+    <strong>Titel:</strong>
     <%= task.title %>
   </p>
 
   <p>
-    <strong>Description:</strong>
+    <strong>Beschreibung:</strong>
     <%= task.description %>
   </p>
 
   <p>
-    <strong>Completed:</strong>
-    <%= task.completed %>
+    <strong>Status:</strong>
+    <% case task.status %>
+    <% when "open" %>
+      Offen
+    <% when "claimed" %>
+      Übernommen
+    <% when "done" %>
+      Erledigt
+    <% else %>
+      <%= task.status %>
+    <% end %>
   </p>
 
+  <% if task.assignee.present? %>
+    <p>
+      <strong>Zugewiesen an:</strong>
+      <%= task.assignee %>
+    </p>
+  <% end %>
+
   <p>
-    <strong>Creator name:</strong>
+    <strong>Erstellt von:</strong>
     <%= task.creator_name %>
   </p>
 
   <p>
-    <strong>Time needed in hours:</strong>
-    <%= task.time_needed_in_hours %>
+    <strong>Dringend:</strong>
+    <%= task.urgent ? "Ja" : "Nein" %>
   </p>
 
-  <p>
-    <strong>Due Date:</strong>
-    <%= task.due_date %>
-  </p>
+  <% if task.due_date.present? %>
+    <p>
+      <strong>Fällig bis:</strong>
+      <%= task.due_date %>
+    </p>
+  <% end %>
+
+  <% if task.time_needed_in_hours.present? %>
+    <p>
+      <strong>Zeitaufwand:</strong>
+      <%= task.time_needed_in_hours %> Std.
+    </p>
+  <% end %>
+
+  <% if task.activity_points.present? %>
+    <p>
+      <strong>Aktivitätspunkte:</strong>
+      <%= task.activity_points %>
+    </p>
+  <% end %>
 
   <p>
-    <strong>Activity points:</strong>
-    <%= task.activity_points %>
-  </p>
-
-  <p>
-    <strong>Urgent:</strong>
-    <%= task.urgent %>
-  </p>
-
-  <p>
-    <strong>Category:</strong>
+    <strong>Kategorie:</strong>
     <%= task.category.name %>
   </p>
 
   <p>
-    <strong>Entity:</strong>
+    <strong>Gliederung:</strong>
     <%= task.entity.name %>
   </p>
 

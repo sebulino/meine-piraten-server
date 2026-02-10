@@ -10,11 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_04_111715) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_10_120001) do
   create_table "categories", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "comments", force: :cascade do |t|
+    t.integer "task_id", null: false
+    t.string "author_name"
+    t.text "text"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["task_id"], name: "index_comments_on_task_id"
   end
 
   create_table "entities", force: :cascade do |t|
@@ -40,10 +49,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_04_111715) do
     t.datetime "updated_at", null: false
     t.date "due_date"
     t.boolean "urgent"
+    t.string "status", default: "open"
+    t.string "assignee"
     t.index ["category_id"], name: "index_tasks_on_category_id"
     t.index ["entity_id"], name: "index_tasks_on_entity_id"
   end
 
+  add_foreign_key "comments", "tasks"
   add_foreign_key "tasks", "categories"
   add_foreign_key "tasks", "entities"
 end
