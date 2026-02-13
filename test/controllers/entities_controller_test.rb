@@ -2,7 +2,7 @@ require "test_helper"
 
 class EntitiesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @entity = entities(:one)
+    @entity = entities(:lv_hessen)
   end
 
   test "should get index" do
@@ -39,8 +39,10 @@ class EntitiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should destroy entity" do
+    # Use an entity with no associated tasks to avoid FK constraint
+    entity_without_tasks = entities(:ov_schwabing)
     assert_difference("Entity.count", -1) do
-      delete entity_url(@entity)
+      delete entity_url(entity_without_tasks)
     end
 
     assert_redirected_to entities_url
