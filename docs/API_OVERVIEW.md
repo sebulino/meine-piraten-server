@@ -33,8 +33,8 @@ Wrap parameters in a `task` key:
 ```json
 {
   "task": {
-    "title": "string",
-    "description": "text (optional)",
+    "title": "string (required, max 200 characters)",
+    "description": "text (optional, max 2000 characters)",
     "completed": "boolean",
     "creator_name": "string",
     "time_needed_in_hours": "integer (optional)",
@@ -43,7 +43,7 @@ Wrap parameters in a `task` key:
     "urgent": "boolean (optional)",
     "category_id": "integer (required, foreign key)",
     "entity_id": "integer (required, foreign key)",
-    "status": "string (optional, one of: open, claimed, done; default: open)",
+    "status": "string (optional, one of: open, claimed, done; default: open; see status transitions below)",
     "assignee": "string (optional)"
   }
 }
@@ -68,7 +68,7 @@ Wrap parameters in a `task` key:
   "assignee": null,
   "created_at": "2025-05-04T12:00:00.000Z",
   "updated_at": "2025-05-04T12:00:00.000Z",
-  "url": "http://localhost:3000/tasks/1.json"
+  "url": "https://meine-piraten.de/tasks/1.json"
 }
 ```
 
@@ -80,6 +80,18 @@ Wrap parameters in a `task` key:
   { "id": 2, "title": "...", ... }
 ]
 ```
+
+#### Status Transitions
+
+Task status follows a strict state machine. Invalid transitions return **422 Unprocessable Entity**.
+
+| From | Allowed transitions |
+|------|-------------------|
+| `open` | `claimed` |
+| `claimed` | `done`, `open` |
+| `done` | *(none — terminal state)* |
+
+For example, a task cannot go directly from `open` to `done`; it must first be `claimed`.
 
 ---
 
@@ -123,7 +135,7 @@ An entity represents an organizational unit (e.g. Kreisverband, Landesverband, O
   "entity_id": 2,
   "created_at": "2025-04-04T14:07:33.000Z",
   "updated_at": "2025-04-04T14:07:33.000Z",
-  "url": "http://localhost:3000/entities/1.json"
+  "url": "https://meine-piraten.de/entities/1.json"
 }
 ```
 
@@ -161,7 +173,7 @@ A category classifies tasks (e.g. "Wahlkampf", "Verwaltung", "Veranstaltung").
   "name": "Wahlkampf",
   "created_at": "2025-04-04T14:27:33.000Z",
   "updated_at": "2025-04-04T14:27:33.000Z",
-  "url": "http://localhost:3000/categories/1.json"
+  "url": "https://meine-piraten.de/categories/1.json"
 }
 ```
 
@@ -200,7 +212,7 @@ Comments are nested under tasks. Each comment belongs to a task.
   "text": "Flyer sind bestellt.",
   "created_at": "2025-05-04T12:30:00.000Z",
   "updated_at": "2025-05-04T12:30:00.000Z",
-  "url": "http://localhost:3000/tasks/1/comments/1.json"
+  "url": "https://meine-piraten.de/tasks/1/comments/1.json"
 }
 ```
 
@@ -222,8 +234,8 @@ Comments are nested under tasks. Each comment belongs to a task.
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | integer | primary key, auto-increment |
-| title | string | |
-| description | text | |
+| title | string | required, max 200 characters |
+| description | text | max 2000 characters |
 | completed | boolean | |
 | creator_name | string | |
 | time_needed_in_hours | integer | |

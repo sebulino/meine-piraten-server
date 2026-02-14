@@ -6,7 +6,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
   end
 
   EXPECTED_COMMENT_FIELDS = %w[
-    id task_id author_name text created_at
+    id task_id author_name text created_at updated_at
   ].freeze
 
   # -- Index --
