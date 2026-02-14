@@ -1,21 +1,83 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  title: MyString
-  description: MyText
+wahlkampfmaterial:
+  title: Wahlkampfmaterial bestellen
+  description: Flyer und Plakate fuer den Infostand am Samstag vorbereiten.
   completed: false
-  creator_name: MyString
-  time_needed_in_hours: 1
-  activity_points: 1
-  category: one
-  entity: one
+  creator_name: pirat42
+  time_needed_in_hours: 2
+  due_date: <%= 4.days.from_now.to_date %>
+  urgent: true
+  activity_points: 10
+  status: open
+  assignee:
+  category: wahlkampf
+  entity: kv_frankfurt
 
-two:
-  title: MyString
-  description: MyText
+pressemitteilung:
+  title: Pressemitteilung Digitalisierung
+  description:
   completed: false
-  creator_name: MyString
+  creator_name: pirat42
+  time_needed_in_hours: 3
+  due_date: <%= 7.days.from_now.to_date %>
+  urgent: false
+  activity_points: 15
+  status: open
+  assignee:
+  category: oeffentlichkeitsarbeit
+  entity: lv_hessen
+
+protokoll:
+  title: Protokoll der letzten Sitzung
+  description: Protokoll der Kreisvorstandssitzung vom 25.01. ins Wiki eintragen.
+  completed: false
+  creator_name: pirat99
   time_needed_in_hours: 1
-  activity_points: 1
-  category: two
-  entity: two
+  due_date: <%= 1.day.ago.to_date %>
+  urgent: false
+  activity_points: 5
+  status: claimed
+  assignee: pirat42
+  category: verwaltung
+  entity: kv_muenchen
+
+social_media:
+  title: Social Media Posts vorbereiten
+  description: 3-5 Posts fuer die kommende Woche zum Thema Netzpolitik.
+  completed: false
+  creator_name: pirat42
+  time_needed_in_hours:
+  due_date:
+  urgent: false
+  activity_points:
+  status: claimed
+  assignee: pirat99
+  category: oeffentlichkeitsarbeit
+  entity: kv_frankfurt
+
+newsletter:
+  title: Newsletter-Entwurf pruefen
+  description: Korrekturlesen des monatlichen Newsletters.
+  completed: true
+  creator_name: pirat99
+  time_needed_in_hours: 1
+  due_date: <%= 2.days.ago.to_date %>
+  urgent: true
+  activity_points: 5
+  status: done
+  assignee: pirat42
+  category: oeffentlichkeitsarbeit
+  entity: lv_bayern
+
+raumreservierung:
+  title: Raumreservierung Stammtisch
+  description: Raum fuer den monatlichen Stammtisch im Februar reservieren.
+  completed: true
+  creator_name: pirat42
+  time_needed_in_hours:
+  due_date: <%= 5.days.ago.to_date %>
+  urgent: false
+  activity_points: 3
+  status: done
+  assignee: pirat99
+  category: veranstaltung
+  entity: kv_muenchen

@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     resources :comments, only: [ :index, :create, :destroy ]
   end
   resources :entities
+  get "api", to: "pages#api"
   resources :categories
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

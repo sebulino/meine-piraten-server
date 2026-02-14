@@ -1,0 +1,23 @@
+samstag_mitbringen:
+  task: wahlkampfmaterial
+  author_name: pirat42
+  text: Kann ich Samstag mitbringen.
+  created_at: <%= 1.day.ago %>
+
+aufkleber_bestellen:
+  task: wahlkampfmaterial
+  author_name: pirat99
+  text: Bitte auch Aufkleber bestellen.
+  created_at: <%= 1.hour.ago %>
+
+wiki_link:
+  task: protokoll
+  author_name: pirat42
+  text: Hier ist der Link zum Wiki-Eintrag.
+  created_at: <%= 2.hours.ago %>
+
+newsletter_fertig:
+  task: newsletter
+  author_name: pirat99
+  text: Sieht gut aus, kann raus.
+  created_at: <%= 3.days.ago %>

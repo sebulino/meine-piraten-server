@@ -1,15 +1,34 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  name: MyString
-  LV: false
+lv_hessen:
+  name: LV Hessen
+  LV: true
   OV: false
   KV: false
-  entity_id: 1
+  entity_id:
 
-two:
-  name: MyString
+kv_frankfurt:
+  name: KV Frankfurt
   LV: false
   OV: false
+  KV: true
+  entity_id:
+
+lv_bayern:
+  name: LV Bayern
+  LV: true
+  OV: false
   KV: false
-  entity_id: 1
+  entity_id:
+
+kv_muenchen:
+  name: KV Muenchen
+  LV: false
+  OV: false
+  KV: true
+  entity_id:
+
+ov_schwabing:
+  name: OV Schwabing
+  LV: false
+  OV: true
+  KV: false
+  entity_id:

@@ -60,4 +60,6 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
+  # Pin minitest to 5.x — minitest 6.0 changed run() signature, breaking Rails 8
+  gem "minitest", "~> 5.25"
 end

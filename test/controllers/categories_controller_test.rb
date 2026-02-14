@@ -2,7 +2,7 @@ require "test_helper"
 
 class CategoriesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @category = categories(:one)
+    @category = categories(:wahlkampf)
   end
 
   test "should get index" do
@@ -39,8 +39,10 @@ class CategoriesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should destroy category" do
+    # Use a category with no associated tasks to avoid FK constraint
+    category_without_tasks = categories(:unused_category)
     assert_difference("Category.count", -1) do
-      delete category_url(@category)
+      delete category_url(category_without_tasks)
     end
 
     assert_redirected_to categories_url
