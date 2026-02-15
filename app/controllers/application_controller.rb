@@ -1,5 +1,33 @@
 class ApplicationController < ActionController::Base
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
-  protect_from_forgery with: :exception, unless: -> { request.format.json? } #TODO change after auth impelmentation
+  protect_from_forgery with: :exception, unless: -> { request.format.json? }
+
+  before_action :authenticate_request!
+
+  private
+
+  def authenticate_request!
+    if request.format.json?
+      authenticate_api_request!
+    else
+      authenticate_user!
+    end
+  end
+
+  def authenticate_api_request!
+    token = request.headers["Authorization"]&.delete_prefix("Bearer ")
+    if token.blank?
+      render json: { error: "Authorization header required" }, status: :unauthorized
+      return
+    end
+
+    payload = KeycloakTokenVerifier.verify(token)
+    @current_api_user = User.find_or_create_by(provider: "openid_connect", uid: payload["sub"]) do |user|
+      user.email = payload["email"]
+      user.name = payload["name"]
+      user.preferred_username = payload["preferred_username"]
+    end
+  rescue JWT::DecodeError, JWT::ExpiredSignature, JWT::InvalidIssuerError => e
+    render json: { error: "Invalid token: #{e.message}" }, status: :unauthorized
+  end
 end

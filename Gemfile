@@ -16,6 +16,10 @@ gem "turbo-rails"
 gem "stimulus-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
+gem "devise", "~> 4.9"
+gem "omniauth_openid_connect", "~> 0.3"
+gem "omniauth-rails_csrf_protection", "~> 1.0"
+gem "jwt", "~> 2.9"
 
 gem "image_processing", "~> 1.2"
 
@@ -45,6 +49,7 @@ gem "thruster", require: false
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
+  gem "dotenv-rails", "~> 3.1"
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false
@@ -64,4 +69,5 @@ group :test do
   gem "selenium-webdriver"
   # Pin minitest to 5.x — minitest 6.0 changed run() signature, breaking Rails 8
   gem "minitest", "~> 5.25"
+  gem "mocha", "~> 2.7"
 end

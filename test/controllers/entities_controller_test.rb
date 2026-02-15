@@ -3,6 +3,7 @@ require "test_helper"
 class EntitiesControllerTest < ActionDispatch::IntegrationTest
   setup do
     @entity = entities(:lv_hessen)
+    sign_in users(:pirat)
   end
 
   test "should get index" do
