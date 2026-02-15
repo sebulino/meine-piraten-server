@@ -1,0 +1,7 @@
+pirat:
+  provider: openid_connect
+  uid: "keycloak-uuid-1234"
+  email: "pirat@piratenpartei.de"
+  name: "Test Pirat"
+  preferred_username: "testpirat"
+  sign_in_count: 1

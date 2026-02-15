@@ -10,49 +10,68 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_10_120001) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_15_203452) do
   create_table "categories", force: :cascade do |t|
-    t.string "name"
     t.datetime "created_at", null: false
+    t.string "name"
     t.datetime "updated_at", null: false
   end
 
   create_table "comments", force: :cascade do |t|
-    t.integer "task_id", null: false
     t.string "author_name"
-    t.text "text"
     t.datetime "created_at", null: false
+    t.integer "task_id", null: false
+    t.text "text"
     t.datetime "updated_at", null: false
     t.index ["task_id"], name: "index_comments_on_task_id"
   end
 
   create_table "entities", force: :cascade do |t|
-    t.string "name"
+    t.boolean "KV"
     t.boolean "LV"
     t.boolean "OV"
-    t.boolean "KV"
-    t.integer "entity_id"
     t.datetime "created_at", null: false
+    t.integer "entity_id"
+    t.string "name"
     t.datetime "updated_at", null: false
   end
 
   create_table "tasks", force: :cascade do |t|
-    t.string "title"
-    t.text "description"
-    t.boolean "completed"
-    t.string "creator_name"
-    t.integer "time_needed_in_hours"
     t.integer "activity_points"
-    t.integer "category_id", null: false
-    t.integer "entity_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.date "due_date"
-    t.boolean "urgent"
-    t.string "status", default: "open"
     t.string "assignee"
+    t.integer "category_id", null: false
+    t.boolean "completed"
+    t.datetime "created_at", null: false
+    t.string "creator_name"
+    t.text "description"
+    t.date "due_date"
+    t.integer "entity_id", null: false
+    t.string "status", default: "open"
+    t.integer "time_needed_in_hours"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.boolean "urgent"
     t.index ["category_id"], name: "index_tasks_on_category_id"
     t.index ["entity_id"], name: "index_tasks_on_entity_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "current_sign_in_at"
+    t.string "current_sign_in_ip"
+    t.string "email"
+    t.datetime "last_sign_in_at"
+    t.string "last_sign_in_ip"
+    t.string "name"
+    t.string "preferred_username"
+    t.string "provider", default: "openid_connect", null: false
+    t.text "refresh_token"
+    t.integer "sign_in_count", default: 0, null: false
+    t.datetime "token_expires_at"
+    t.string "uid", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email"
+    t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
   end
 
   add_foreign_key "comments", "tasks"

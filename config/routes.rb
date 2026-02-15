@@ -1,4 +1,12 @@
 Rails.application.routes.draw do
+  devise_for :users, controllers: {
+    omniauth_callbacks: "users/omniauth_callbacks"
+  }
+  devise_scope :user do
+    get  "sign_in",  to: "users/sessions#new",     as: :new_user_session
+    delete "sign_out", to: "users/sessions#destroy", as: :destroy_user_session
+    get "users/auth/failure", to: "users/omniauth_callbacks#failure"
+  end
   resources :tasks do
     resources :comments, only: [ :index, :create, :destroy ]
   end

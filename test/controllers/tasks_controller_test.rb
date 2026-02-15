@@ -3,6 +3,14 @@ require "test_helper"
 class TasksControllerTest < ActionDispatch::IntegrationTest
   setup do
     @task = tasks(:wahlkampfmaterial)
+    @auth_headers = { "Authorization" => "Bearer mock-token" }
+    @token_payload = {
+      "sub" => "keycloak-uuid-1234",
+      "email" => "pirat@piratenpartei.de",
+      "name" => "Test Pirat",
+      "preferred_username" => "testpirat"
+    }
+    KeycloakTokenVerifier.stubs(:verify).with("mock-token").returns(@token_payload)
   end
 
   EXPECTED_TASK_FIELDS = %w[
@@ -14,7 +22,7 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
   # -- Index --
 
   test "GET /tasks.json returns array with correct fields" do
-    get tasks_url(format: :json)
+    get tasks_url(format: :json), headers: @auth_headers
     assert_response :success
 
     json = JSON.parse(response.body)
@@ -27,10 +35,15 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "GET /tasks.json without auth returns 401" do
+    get tasks_url(format: :json)
+    assert_response :unauthorized
+  end
+
   # -- Show --
 
   test "GET /tasks/:id.json returns single task with all fields" do
-    get task_url(@task, format: :json)
+    get task_url(@task, format: :json), headers: @auth_headers
     assert_response :success
 
     json = JSON.parse(response.body)
@@ -56,7 +69,7 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
           activity_points: 5,
           time_needed_in_hours: 1
         }
-      }
+      }, headers: @auth_headers
     end
 
     assert_response :created
@@ -74,7 +87,7 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
           category_id: categories(:wahlkampf).id,
           entity_id: entities(:kv_frankfurt).id
         }
-      }
+      }, headers: @auth_headers
     end
 
     assert_response :unprocessable_entity
@@ -89,7 +102,7 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
           category_id: categories(:wahlkampf).id,
           entity_id: entities(:kv_frankfurt).id
         }
-      }
+      }, headers: @auth_headers
     end
 
     assert_response :unprocessable_entity
@@ -100,7 +113,7 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
   test "PATCH /tasks/:id.json with valid status transition returns 200" do
     patch task_url(@task, format: :json), params: {
       task: { status: "claimed", assignee: "pirat42" }
-    }
+    }, headers: @auth_headers
 
     assert_response :success
     json = JSON.parse(response.body)
@@ -110,7 +123,7 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
   test "PATCH /tasks/:id.json with invalid status transition returns 422" do
     patch task_url(@task, format: :json), params: {
       task: { status: "done" }
-    }
+    }, headers: @auth_headers
 
     assert_response :unprocessable_entity
   end
@@ -119,7 +132,7 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
 
   test "DELETE /tasks/:id.json returns 204" do
     assert_difference("Task.count", -1) do
-      delete task_url(@task, format: :json)
+      delete task_url(@task, format: :json), headers: @auth_headers
     end
 
     assert_response :no_content
