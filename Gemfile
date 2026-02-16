@@ -18,7 +18,7 @@ gem "stimulus-rails"
 gem "jbuilder"
 gem "devise", "~> 4.9"
 gem "omniauth_openid_connect", "~> 0.3"
-gem "omniauth-rails_csrf_protection", "~> 1.0"
+gem "omniauth-rails_csrf_protection", "~> 2.0"
 gem "jwt", "~> 2.9"
 
 gem "image_processing", "~> 1.2"
