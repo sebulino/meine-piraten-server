@@ -13,6 +13,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   end
 
   def failure
+    Rails.logger.error "SSO failure: message=#{failure_message} | error=#{request.env['omniauth.error']&.message} | type=#{request.env['omniauth.error.type']}"
     redirect_to root_path, alert: "Anmeldung fehlgeschlagen: #{failure_message}"
   end
 end

@@ -17,7 +17,7 @@ gem "stimulus-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 gem "devise", "~> 5.0"
-gem "omniauth_openid_connect", "~> 0.3"
+gem "omniauth_openid_connect", "~> 0.8"
 gem "omniauth-rails_csrf_protection", "~> 2.0"
 gem "jwt", "~> 3.1"
 

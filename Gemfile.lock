@@ -491,7 +491,7 @@ DEPENDENCIES
   minitest (~> 5.25)
   mocha (~> 3.0)
   omniauth-rails_csrf_protection (~> 2.0)
-  omniauth_openid_connect (~> 0.3)
+  omniauth_openid_connect (~> 0.8)
   propshaft
   puma (>= 5.0)
   rails (~> 8.1.2)
