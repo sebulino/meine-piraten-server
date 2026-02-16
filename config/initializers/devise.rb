@@ -287,6 +287,8 @@ Devise.setup do |config|
       ENV.fetch("KEYCLOAK_CLIENT_SECRET")
     end
 
+  callback_url = ENV.fetch("OIDC_REDIRECT_URI", "https://meine-piraten.de/users/auth/openid_connect/callback")
+
   config.omniauth :openid_connect,
     name: :openid_connect,
     scope: [:openid, :profile, :offline_access],
@@ -296,7 +298,7 @@ Devise.setup do |config|
     client_options: {
       identifier: client_id,
       secret: client_secret,
-      redirect_uri: nil
+      redirect_uri: callback_url
     },
     pkce: true
 
