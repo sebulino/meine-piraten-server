@@ -14,7 +14,7 @@
         <li><span class="user-name"><%= current_user.preferred_username || current_user.name || current_user.email %></span></li>
         <li><%= button_to "Abmelden", destroy_user_session_path, method: :delete, class: "btn-logout" %></li>
       <% else %>
-        <li><%= button_to "Anmelden", user_openid_connect_omniauth_authorize_path, method: :post, class: "btn btn-primary btn-sm" %></li>
+        <li><%= button_to "Anmelden", user_openid_connect_omniauth_authorize_path, method: :post, class: "btn btn-primary btn-sm", form: { data: { turbo: false } } %></li>
       <% end %>
     </ul>
   </div>
