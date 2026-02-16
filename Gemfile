@@ -68,6 +68,6 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
   # Pin minitest to 5.x — minitest 6.0 changed run() signature, breaking Rails 8
-  gem "minitest", "~> 6.0"
+  gem "minitest", "~> 5.25"
   gem "mocha", "~> 3.0"
 end
