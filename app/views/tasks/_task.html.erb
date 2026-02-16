@@ -1,74 +1,72 @@
 <div id="<%= dom_id task %>">
-  <p>
-    <strong>Titel:</strong>
-    <%= task.title %>
-  </p>
-
-  <p>
-    <strong>Beschreibung:</strong>
-    <%= task.description %>
-  </p>
-
-  <p>
-    <strong>Status:</strong>
+  <div class="card-header">
+    <h2><%= task.title %></h2>
     <% case task.status %>
     <% when "open" %>
-      Offen
+      <span class="badge badge-open">Offen</span>
     <% when "claimed" %>
-      Übernommen
+      <span class="badge badge-claimed">Übernommen</span>
     <% when "done" %>
-      Erledigt
-    <% else %>
-      <%= task.status %>
+      <span class="badge badge-done">Erledigt</span>
     <% end %>
-  </p>
+  </div>
 
-  <% if task.assignee.present? %>
-    <p>
-      <strong>Zugewiesen an:</strong>
-      <%= task.assignee %>
-    </p>
+  <% if task.description.present? %>
+    <div class="detail-item detail-full" style="margin-bottom: var(--space-lg);">
+      <div class="detail-label">Beschreibung</div>
+      <div class="detail-value"><%= task.description %></div>
+    </div>
   <% end %>
 
-  <p>
-    <strong>Erstellt von:</strong>
-    <%= task.creator_name %>
-  </p>
+  <div class="detail-grid">
+    <div class="detail-item">
+      <div class="detail-label">Erstellt von</div>
+      <div class="detail-value"><%= task.creator_name %></div>
+    </div>
 
-  <p>
-    <strong>Dringend:</strong>
-    <%= task.urgent ? "Ja" : "Nein" %>
-  </p>
+    <% if task.assignee.present? %>
+      <div class="detail-item">
+        <div class="detail-label">Zugewiesen an</div>
+        <div class="detail-value"><%= task.assignee %></div>
+      </div>
+    <% end %>
 
-  <% if task.due_date.present? %>
-    <p>
-      <strong>Fällig bis:</strong>
-      <%= task.due_date %>
-    </p>
-  <% end %>
+    <div class="detail-item">
+      <div class="detail-label">Kategorie</div>
+      <div class="detail-value"><%= task.category.name %></div>
+    </div>
 
-  <% if task.time_needed_in_hours.present? %>
-    <p>
-      <strong>Zeitaufwand:</strong>
-      <%= task.time_needed_in_hours %> Std.
-    </p>
-  <% end %>
+    <div class="detail-item">
+      <div class="detail-label">Gliederung</div>
+      <div class="detail-value"><%= task.entity.name %></div>
+    </div>
 
-  <% if task.activity_points.present? %>
-    <p>
-      <strong>Aktivitätspunkte:</strong>
-      <%= task.activity_points %>
-    </p>
-  <% end %>
+    <div class="detail-item">
+      <div class="detail-label">Dringend</div>
+      <div class="detail-value">
+        <%= task.urgent ? raw('<span class="badge badge-urgent">Dringend</span>') : "Nein" %>
+      </div>
+    </div>
 
-  <p>
-    <strong>Kategorie:</strong>
-    <%= task.category.name %>
-  </p>
+    <% if task.due_date.present? %>
+      <div class="detail-item">
+        <div class="detail-label">Fällig bis</div>
+        <div class="detail-value"><%= task.due_date.strftime("%d.%m.%Y") %></div>
+      </div>
+    <% end %>
 
-  <p>
-    <strong>Gliederung:</strong>
-    <%= task.entity.name %>
-  </p>
+    <% if task.time_needed_in_hours.present? %>
+      <div class="detail-item">
+        <div class="detail-label">Zeitaufwand</div>
+        <div class="detail-value"><%= task.time_needed_in_hours %> Std.</div>
+      </div>
+    <% end %>
 
+    <% if task.activity_points.present? %>
+      <div class="detail-item">
+        <div class="detail-label">Aktivitätspunkte</div>
+        <div class="detail-value"><%= task.activity_points %></div>
+      </div>
+    <% end %>
+  </div>
 </div>

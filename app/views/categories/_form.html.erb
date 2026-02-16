@@ -1,8 +1,7 @@
 <%= form_with(model: category) do |form| %>
   <% if category.errors.any? %>
-    <div style="color: red">
+    <div class="form-errors">
       <h2><%= pluralize(category.errors.count, "Fehler") %> beim Speichern:</h2>
-
       <ul>
         <% category.errors.each do |error| %>
           <li><%= error.full_message %></li>
@@ -11,12 +10,12 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :name, "Name", style: "display: block" %>
+  <div class="form-group">
+    <%= form.label :name, "Name" %>
     <%= form.text_field :name %>
   </div>
 
-  <div>
-    <%= form.submit %>
+  <div class="btn-group">
+    <%= form.submit class: "btn btn-primary" %>
   </div>
 <% end %>

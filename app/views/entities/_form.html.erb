@@ -1,8 +1,7 @@
 <%= form_with(model: entity) do |form| %>
   <% if entity.errors.any? %>
-    <div style="color: red">
+    <div class="form-errors">
       <h2><%= pluralize(entity.errors.count, "Fehler") %> beim Speichern:</h2>
-
       <ul>
         <% entity.errors.each do |error| %>
           <li><%= error.full_message %></li>
@@ -11,32 +10,38 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :name, "Name", style: "display: block" %>
+  <div class="form-group">
+    <%= form.label :name, "Name" %>
     <%= form.text_field :name %>
   </div>
 
-  <div>
-    <%= form.label :LV, "Landesverband (LV)", style: "display: block" %>
-    <%= form.checkbox :LV %>
+  <div class="form-group">
+    <div class="checkbox-row">
+      <%= form.checkbox :LV %>
+      <%= form.label :LV, "Landesverband (LV)" %>
+    </div>
   </div>
 
-  <div>
-    <%= form.label :OV, "Ortsverband (OV)", style: "display: block" %>
-    <%= form.checkbox :OV %>
+  <div class="form-group">
+    <div class="checkbox-row">
+      <%= form.checkbox :OV %>
+      <%= form.label :OV, "Ortsverband (OV)" %>
+    </div>
   </div>
 
-  <div>
-    <%= form.label :KV, "Kreisverband (KV)", style: "display: block" %>
-    <%= form.checkbox :KV %>
+  <div class="form-group">
+    <div class="checkbox-row">
+      <%= form.checkbox :KV %>
+      <%= form.label :KV, "Kreisverband (KV)" %>
+    </div>
   </div>
 
-  <div class="field">
+  <div class="form-group">
     <%= form.label :entity_id, "Übergeordnete Gliederung" %>
     <%= form.collection_select(:entity_id, Entity.where.not(id: entity.id), :id, :name, prompt: "Keine (oberste Ebene)", include_blank: false) %>
   </div>
 
-  <div>
-    <%= form.submit %>
+  <div class="btn-group">
+    <%= form.submit class: "btn btn-primary" %>
   </div>
 <% end %>

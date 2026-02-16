@@ -1,8 +1,9 @@
-<p style="color: green"><%= notice %></p>
-
 <% content_for :title, "Aufgaben" %>
 
-<h1>Was gibt es alles zu tun?</h1>
+<div class="page-header">
+  <h1>Was gibt es alles zu tun?</h1>
+  <%= link_to "Neues ToDo", new_task_path, class: "btn btn-primary" %>
+</div>
 
 <table>
   <thead>
@@ -13,7 +14,7 @@
       <th>Gliederung</th>
       <th>Zugewiesen an</th>
       <th>Dringend</th>
-      <th>Aufwand (Std.)</th>
+      <th>Aufwand</th>
       <th>Fällig bis</th>
     </tr>
   </thead>
@@ -25,27 +26,22 @@
         <td>
           <% case task.status %>
           <% when "open" %>
-            Offen
+            <span class="badge badge-open">Offen</span>
           <% when "claimed" %>
-            Übernommen
+            <span class="badge badge-claimed">Übernommen</span>
           <% when "done" %>
-            Erledigt
+            <span class="badge badge-done">Erledigt</span>
           <% else %>
-            <%= task.status %>
+            <span class="badge"><%= task.status %></span>
           <% end %>
         </td>
         <td><%= task.category.name if task.category %></td>
         <td><%= task.entity.name if task.entity %></td>
         <td><%= task.assignee %></td>
-        <td><%= task.urgent ? "Ja" : "" %></td>
-        <td><%= task.time_needed_in_hours %></td>
-        <td><%= task.due_date %></td>
+        <td><%= task.urgent ? raw('<span class="badge badge-urgent">Dringend</span>') : "" %></td>
+        <td><%= "#{task.time_needed_in_hours} Std." if task.time_needed_in_hours %></td>
+        <td><%= task.due_date&.strftime("%d.%m.%Y") %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
-
-
-<%= link_to "Neues ToDo", new_task_path %>
-<%= link_to "Kategorien", categories_path %>
-<%= link_to "Gliederungen", entities_path %>

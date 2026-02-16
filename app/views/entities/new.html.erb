@@ -2,10 +2,10 @@
 
 <h1>Neue Gliederung</h1>
 
-<%= render "form", entity: @entity %>
+<div class="card">
+  <%= render "form", entity: @entity %>
+</div>
 
-<br>
-
-<div>
-  <%= link_to "Zurück zur Liste", entities_path %>
+<div style="margin-top: var(--space-md);">
+  <%= link_to "Zurück zur Liste", entities_path, class: "btn btn-secondary" %>
 </div>

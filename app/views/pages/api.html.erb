@@ -4,8 +4,48 @@
 <ul>
   <li><strong>Base URL:</strong> <code>https://meine-piraten.de</code></li>
   <li><strong>Format:</strong> JSON &mdash; append <code>.json</code> to any endpoint or send <code>Accept: application/json</code></li>
-  <li><strong>Authentication:</strong> None (all endpoints are publicly accessible)</li>
 </ul>
+
+<hr>
+
+<h2>Authentication</h2>
+<p>All API endpoints require authentication via a <strong>Bearer token</strong> (JWT) issued by PiratenSSO (Keycloak).</p>
+
+<h3>Obtaining a token</h3>
+<p>Request an access token from the PiratenSSO token endpoint using the OAuth 2.0 authorization code flow or client credentials:</p>
+<pre><code>POST https://sso.piratenpartei.de/realms/Piratenlogin/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials
+&client_id=YOUR_CLIENT_ID
+&client_secret=YOUR_CLIENT_SECRET</code></pre>
+
+<p>The response contains an <code>access_token</code>:</p>
+<pre><code>{
+  "access_token": "eyJhbGciOiJSUzI1NiIs...",
+  "expires_in": 300,
+  "token_type": "Bearer"
+}</code></pre>
+
+<h3>Using the token</h3>
+<p>Include the token in the <code>Authorization</code> header of every API request:</p>
+<pre><code>Authorization: Bearer eyJhbGciOiJSUzI1NiIs...</code></pre>
+
+<h3>Error responses</h3>
+<table>
+  <thead>
+    <tr><th>Status</th><th>Body</th><th>Cause</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>401</code></td><td><code>{"error": "Authorization header required"}</code></td><td>No <code>Authorization</code> header sent</td></tr>
+    <tr><td><code>401</code></td><td><code>{"error": "Invalid token: ..."}</code></td><td>Token is expired, malformed, or signed by an untrusted issuer</td></tr>
+  </tbody>
+</table>
+
+<h3>Example: authenticated request</h3>
+<pre><code>curl -H "Authorization: Bearer eyJhbG..." \
+     -H "Accept: application/json" \
+     https://meine-piraten.de/tasks.json</code></pre>
 
 <hr>
 

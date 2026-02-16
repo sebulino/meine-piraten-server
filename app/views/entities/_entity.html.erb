@@ -1,29 +1,27 @@
 <div id="<%= dom_id entity %>">
-  <p>
-    <strong>Name:</strong>
-    <%= entity.name %>
-  </p>
+  <h2><%= entity.name %></h2>
 
-  <p>
-    <strong>Landesverband (LV):</strong>
-    <%= entity.LV ? "Ja" : "Nein" %>
-  </p>
+  <div class="detail-grid">
+    <div class="detail-item">
+      <div class="detail-label">Landesverband (LV)</div>
+      <div class="detail-value"><%= entity.LV ? "Ja" : "Nein" %></div>
+    </div>
 
-  <p>
-    <strong>Ortsverband (OV):</strong>
-    <%= entity.OV ? "Ja" : "Nein" %>
-  </p>
+    <div class="detail-item">
+      <div class="detail-label">Ortsverband (OV)</div>
+      <div class="detail-value"><%= entity.OV ? "Ja" : "Nein" %></div>
+    </div>
 
-  <p>
-    <strong>Kreisverband (KV):</strong>
-    <%= entity.KV ? "Ja" : "Nein" %>
-  </p>
+    <div class="detail-item">
+      <div class="detail-label">Kreisverband (KV)</div>
+      <div class="detail-value"><%= entity.KV ? "Ja" : "Nein" %></div>
+    </div>
 
-  <% if entity.entity_id.present? %>
-    <p>
-      <strong>Übergeordnete Gliederung:</strong>
-      <%= Entity.find_by(id: entity.entity_id)&.name || entity.entity_id %>
-    </p>
-  <% end %>
-
+    <% if entity.entity_id.present? %>
+      <div class="detail-item">
+        <div class="detail-label">Übergeordnete Gliederung</div>
+        <div class="detail-value"><%= Entity.find_by(id: entity.entity_id)&.name || entity.entity_id %></div>
+      </div>
+    <% end %>
+  </div>
 </div>

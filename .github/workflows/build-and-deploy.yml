@@ -3,7 +3,7 @@ name: Build, tag and deploy
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "sebastian" ]
 
 permissions:
   contents: write   # allows pushing Git tags
@@ -110,6 +110,11 @@ jobs:
     needs: build
     steps:
       -
+        name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          ref: sebastian
+      -
         name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -125,5 +130,6 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v6
         with:
+          context: .
           push: true
           tags: sebulino/meine-piraten-server:latest

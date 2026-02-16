@@ -2,10 +2,10 @@
 
 <h1>Neue Aufgabe</h1>
 
-<%= render "form", task: @task %>
+<div class="card">
+  <%= render "form", task: @task %>
+</div>
 
-<br>
-
-<div>
-  <%= link_to "Zurück zur Liste", tasks_path %>
+<div style="margin-top: var(--space-md);">
+  <%= link_to "Zurück zur Liste", tasks_path, class: "btn btn-secondary" %>
 </div>

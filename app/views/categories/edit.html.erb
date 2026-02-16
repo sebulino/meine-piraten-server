@@ -2,11 +2,11 @@
 
 <h1>Kategorie bearbeiten</h1>
 
-<%= render "form", category: @category %>
+<div class="card">
+  <%= render "form", category: @category %>
+</div>
 
-<br>
-
-<div>
-  <%= link_to "Kategorie anzeigen", @category %> |
-  <%= link_to "Zurück zur Liste", categories_path %>
+<div class="btn-group" style="margin-top: var(--space-md);">
+  <%= link_to "Kategorie anzeigen", @category, class: "btn btn-secondary" %>
+  <%= link_to "Zurück zur Liste", categories_path, class: "btn btn-secondary" %>
 </div>

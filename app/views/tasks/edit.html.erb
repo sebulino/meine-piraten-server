@@ -2,11 +2,11 @@
 
 <h1>Aufgabe bearbeiten</h1>
 
-<%= render "form", task: @task %>
+<div class="card">
+  <%= render "form", task: @task %>
+</div>
 
-<br>
-
-<div>
-  <%= link_to "Aufgabe anzeigen", @task %> |
-  <%= link_to "Zurück zur Liste", tasks_path %>
+<div class="btn-group" style="margin-top: var(--space-md);">
+  <%= link_to "Aufgabe anzeigen", @task, class: "btn btn-secondary" %>
+  <%= link_to "Zurück zur Liste", tasks_path, class: "btn btn-secondary" %>
 </div>

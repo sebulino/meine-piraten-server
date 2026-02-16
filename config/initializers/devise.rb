@@ -24,7 +24,7 @@ Devise.setup do |config|
   # Configure the e-mail address which will be shown in Devise::Mailer,
   # note that it will be overwritten if you use your own mailer class
   # with default "from" parameter.
-  config.mailer_sender = 'please-change-me-at-config-initializers-devise@example.com'
+  config.mailer_sender = 'sebastian.alscher@piratenpartei.de'
 
   # Configure the class responsible to send e-mails.
   # config.mailer = 'Devise::Mailer'
@@ -268,10 +268,26 @@ Devise.setup do |config|
   # The default HTTP method used to sign out a resource. Default is :delete.
   config.sign_out_via = :delete
 
+  keycloak_secret = ENV["KEYCLOAK_CLIENT_SECRET"]
+
+  if Rails.env.production? && keycloak_secret.blank? && !ENV["ASSETS_PRECOMPILE"]
+    raise "Missing KEYCLOAK_CLIENT_SECRET"
+  end
+
   # ==> OmniAuth
   # Add a new OmniAuth provider. Check the wiki for more information on setting
   # up on your models and hooks.
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
+  client_id = ENV.fetch("KEYCLOAK_CLIENT_ID", "meine_piraten_de")
+
+  client_secret =
+    if ENV["ASSETS_PRECOMPILE"] == "1"
+      ENV["KEYCLOAK_CLIENT_SECRET"] || "dummy"
+    else
+      ENV.fetch("KEYCLOAK_CLIENT_SECRET")
+    end
+
+  callback_url = ENV.fetch("OIDC_REDIRECT_URI", "https://meine-piraten.de/users/auth/openid_connect/callback")
 
   config.omniauth :openid_connect,
     name: :openid_connect,
@@ -280,9 +296,9 @@ Devise.setup do |config|
     issuer: "https://sso.piratenpartei.de/realms/Piratenlogin",
     discovery: true,
     client_options: {
-      identifier: ENV.fetch("KEYCLOAK_CLIENT_ID", "meine_piraten_de"),
-      secret: ENV.fetch("KEYCLOAK_CLIENT_SECRET"),
-      redirect_uri: nil
+      identifier: client_id,
+      secret: client_secret,
+      redirect_uri: callback_url
     },
     pkce: true
 
