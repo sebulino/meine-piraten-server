@@ -29,7 +29,11 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate_api_request!
-    token = request.headers["Authorization"]&.delete_prefix("Bearer ")
+    auth_header = request.headers["Authorization"]
+    Rails.logger.info "API auth: Authorization header #{auth_header.present? ? 'present' : 'MISSING'}"
+    Rails.logger.info "API auth: Request headers: #{request.headers.env.select { |k, _| k.start_with?('HTTP_') }.to_h}" if auth_header.blank?
+
+    token = auth_header&.delete_prefix("Bearer ")
     if token.blank?
       render json: { error: "Authorization header required" }, status: :unauthorized
       return
