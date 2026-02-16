@@ -278,6 +278,14 @@ Devise.setup do |config|
   # Add a new OmniAuth provider. Check the wiki for more information on setting
   # up on your models and hooks.
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
+  client_id = ENV.fetch("KEYCLOAK_CLIENT_ID", "meine_piraten_de")
+
+  client_secret =
+    if ENV["ASSETS_PRECOMPILE"] == "1"
+      ENV["KEYCLOAK_CLIENT_SECRET"] || "dummy"
+    else
+      ENV.fetch("KEYCLOAK_CLIENT_SECRET")
+    end
 
   config.omniauth :openid_connect,
     name: :openid_connect,
@@ -286,8 +294,8 @@ Devise.setup do |config|
     issuer: "https://sso.piratenpartei.de/realms/Piratenlogin",
     discovery: true,
     client_options: {
-      identifier: ENV.fetch("KEYCLOAK_CLIENT_ID", "meine_piraten_de"),
-      secret: ENV.fetch("KEYCLOAK_CLIENT_SECRET"),
+      identifier: client_id,
+      secret: client_secret,
       redirect_uri: nil
     },
     pkce: true
