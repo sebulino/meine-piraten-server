@@ -2,8 +2,6 @@
   <div class="login-card">
     <h2>Meine Piraten</h2>
     <p>Bitte melde dich mit deinem PiratenSSO-Konto an.</p>
-    <%= link_to user_openid_connect_omniauth_authorize_path, data: { turbo_method: :post }, class: "btn-sso" do %>
-      Mit PiratenSSO anmelden
-    <% end %>
+    <%= button_to "Mit PiratenSSO anmelden", user_openid_connect_omniauth_authorize_path, method: :post, class: "btn-sso", form: { style: "width: 100%;" } %>
   </div>
 </div>
