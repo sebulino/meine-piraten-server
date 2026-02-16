@@ -2,11 +2,11 @@
 
 <h1>Gliederung bearbeiten</h1>
 
-<%= render "form", entity: @entity %>
+<div class="card">
+  <%= render "form", entity: @entity %>
+</div>
 
-<br>
-
-<div>
-  <%= link_to "Gliederung anzeigen", @entity %> |
-  <%= link_to "Zurück zur Liste", entities_path %>
+<div class="btn-group" style="margin-top: var(--space-md);">
+  <%= link_to "Gliederung anzeigen", @entity, class: "btn btn-secondary" %>
+  <%= link_to "Zurück zur Liste", entities_path, class: "btn btn-secondary" %>
 </div>

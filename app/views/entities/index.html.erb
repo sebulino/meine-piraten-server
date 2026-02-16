@@ -1,8 +1,9 @@
-<p style="color: green"><%= notice %></p>
-
 <% content_for :title, "Gliederungen" %>
 
-<h1>Gliederungen</h1>
+<div class="page-header">
+  <h1>Gliederungen</h1>
+  <%= link_to "Neue Gliederung", new_entity_path, class: "btn btn-primary" %>
+</div>
 
 <table>
   <thead>
@@ -27,8 +28,3 @@
     <% end %>
   </tbody>
 </table>
-
-
-<%= link_to "Neue Gliederung", new_entity_path %>
-<br>
-<%= link_to "Startseite", tasks_path %>

@@ -1,11 +1,11 @@
-<p style="color: green"><%= notice %></p>
+<% content_for :title, @entity.name %>
 
-<%= render @entity %>
-
-<div>
-  <%= link_to "Bearbeiten", edit_entity_path(@entity) %> |
-  <%= link_to "Zurück zur Liste", entities_path %>
-
-  <%= button_to "Löschen", @entity, method: :delete %>
+<div class="card">
+  <%= render @entity %>
 </div>
-<%= link_to "Startseite", tasks_path %>
+
+<div class="btn-group">
+  <%= link_to "Bearbeiten", edit_entity_path(@entity), class: "btn btn-secondary" %>
+  <%= link_to "Zurück zur Liste", entities_path, class: "btn btn-secondary" %>
+  <%= button_to "Löschen", @entity, method: :delete, class: "btn btn-danger btn-sm" %>
+</div>

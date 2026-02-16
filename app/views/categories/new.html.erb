@@ -2,10 +2,10 @@
 
 <h1>Neue Kategorie</h1>
 
-<%= render "form", category: @category %>
+<div class="card">
+  <%= render "form", category: @category %>
+</div>
 
-<br>
-
-<div>
-  <%= link_to "Zurück zur Liste", categories_path %>
+<div style="margin-top: var(--space-md);">
+  <%= link_to "Zurück zur Liste", categories_path, class: "btn btn-secondary" %>
 </div>

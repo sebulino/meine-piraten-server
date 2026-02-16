@@ -1,21 +1,24 @@
-<p style="color: green"><%= notice %></p>
+<% content_for :title, @task.title %>
 
-<%= render @task %>
+<div class="card">
+  <%= render @task %>
+</div>
 
 <% if @task.comments.any? %>
   <h3>Kommentare</h3>
   <% @task.comments.order(created_at: :asc).each do |comment| %>
-    <div style="margin-bottom: 8px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-      <strong><%= comment.author_name %></strong>
-      <small>(<%= comment.created_at.strftime("%d.%m.%Y %H:%M") %>)</small>
-      <p><%= comment.text %></p>
+    <div class="comment">
+      <div class="comment-header">
+        <span class="comment-author"><%= comment.author_name %></span>
+        <span class="comment-date"><%= comment.created_at.strftime("%d.%m.%Y %H:%M") %></span>
+      </div>
+      <p class="comment-text"><%= comment.text %></p>
     </div>
   <% end %>
 <% end %>
 
-<div>
-  <%= link_to "Bearbeiten", edit_task_path(@task) %> |
-  <%= link_to "Zurück zur Liste", tasks_path %>
-
-  <%= button_to "Löschen", @task, method: :delete %>
+<div class="btn-group" style="margin-top: var(--space-lg);">
+  <%= link_to "Bearbeiten", edit_task_path(@task), class: "btn btn-secondary" %>
+  <%= link_to "Zurück zur Liste", tasks_path, class: "btn btn-secondary" %>
+  <%= button_to "Löschen", @task, method: :delete, class: "btn btn-danger btn-sm" %>
 </div>

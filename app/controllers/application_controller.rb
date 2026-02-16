@@ -7,11 +7,25 @@ class ApplicationController < ActionController::Base
   private
 
   def authenticate_request!
+    if Rails.env.development?
+      sign_in_dev_user unless user_signed_in?
+      return
+    end
+
     if request.format.json?
       authenticate_api_request!
     else
       authenticate_user!
     end
+  end
+
+  def sign_in_dev_user
+    dev_user = User.find_or_create_by(provider: "openid_connect", uid: "dev-local") do |user|
+      user.email = "dev@localhost"
+      user.name = "Dev User"
+      user.preferred_username = "dev"
+    end
+    sign_in(dev_user)
   end
 
   def authenticate_api_request!

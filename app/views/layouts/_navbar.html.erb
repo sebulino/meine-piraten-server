@@ -1,17 +1,21 @@
-    <nav>
-      <ul>
-        <li><%= link_to "Startseite", root_path %></li>
-        <li><%= link_to "Aufgaben", tasks_path %></li>
-        <li><%= link_to "Gliederungen", entities_path %></li>
-        <li><%= link_to "Kategorien", categories_path %></li>
-        <li><%= link_to "API", api_path %></li>
-      </ul>
-      <ul>
-        <% if user_signed_in? %>
-          <li><%= current_user.preferred_username || current_user.name || current_user.email %></li>
-          <li><%= button_to "Abmelden", destroy_user_session_path, method: :delete %></li>
-        <% else %>
-          <li><%= link_to "Anmelden", user_openid_connect_omniauth_authorize_path, data: { turbo_method: :post } %></li>
-        <% end %>
-      </ul>
-    </nav>
+<header class="navbar">
+  <div class="navbar-inner">
+    <%= link_to root_path, class: "navbar-brand" do %>
+      &#x2699;&#xFE0F; Meine Piraten
+    <% end %>
+    <ul class="navbar-links">
+      <li><%= link_to "Aufgaben", tasks_path %></li>
+      <li><%= link_to "Gliederungen", entities_path %></li>
+      <li><%= link_to "Kategorien", categories_path %></li>
+      <li><%= link_to "API", api_path %></li>
+    </ul>
+    <ul class="navbar-user">
+      <% if user_signed_in? %>
+        <li><span class="user-name"><%= current_user.preferred_username || current_user.name || current_user.email %></span></li>
+        <li><%= button_to "Abmelden", destroy_user_session_path, method: :delete, class: "btn-logout" %></li>
+      <% else %>
+        <li><%= link_to "Anmelden", user_openid_connect_omniauth_authorize_path, data: { turbo_method: :post }, class: "btn btn-primary btn-sm" %></li>
+      <% end %>
+    </ul>
+  </div>
+</header>
