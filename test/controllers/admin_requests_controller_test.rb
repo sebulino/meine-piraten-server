@@ -102,4 +102,34 @@ class AdminRequestsControllerTest < ActionDispatch::IntegrationTest
     request.reload
     assert_equal "pending", request.status
   end
+
+  # -- Demote --
+
+  test "PATCH /admin_requests/:id/demote as superadmin revokes admin" do
+    request = admin_requests(:pending_request)
+    user = request.user
+    user.update!(admin: true)
+
+    sign_in users(:superadmin_pirat)
+    patch demote_admin_request_url(request)
+
+    request.reload
+    user.reload
+    assert_equal "rejected", request.status
+    assert_not user.admin?
+    assert_not_nil request.reviewed_by
+    assert_not_nil request.reviewed_at
+    assert_redirected_to admin_requests_path
+  end
+
+  test "PATCH /admin_requests/:id/demote as non-superadmin redirects" do
+    request = admin_requests(:pending_request)
+
+    sign_in users(:admin_pirat)
+    patch demote_admin_request_url(request)
+
+    assert_redirected_to root_path
+    request.reload
+    assert_equal "pending", request.status
+  end
 end

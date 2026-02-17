@@ -17,6 +17,7 @@ Rails.application.routes.draw do
     member do
       patch :approve
       patch :reject
+      patch :demote
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

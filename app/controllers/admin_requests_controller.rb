@@ -1,5 +1,5 @@
 class AdminRequestsController < ApplicationController
-  before_action :require_superadmin!, only: [:index, :approve, :reject]
+  before_action :require_superadmin!, only: [:index, :approve, :reject, :demote]
 
   def index
     @pending_requests = AdminRequest.pending.includes(:user).order(created_at: :desc)
@@ -33,6 +33,17 @@ class AdminRequestsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to admin_requests_path, notice: "Anfrage abgelehnt." }
+      format.json { render json: { status: "rejected" } }
+    end
+  end
+
+  def demote
+    @admin_request = AdminRequest.find(params[:id])
+    @admin_request.user.update!(admin: false)
+    @admin_request.update!(status: "rejected", reviewed_by: current_user_or_api_user, reviewed_at: Time.current)
+
+    respond_to do |format|
+      format.html { redirect_to admin_requests_path, notice: "Admin-Rechte von #{@admin_request.user.preferred_username || @admin_request.user.name} entzogen." }
       format.json { render json: { status: "rejected" } }
     end
   end
