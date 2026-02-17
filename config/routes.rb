@@ -14,6 +14,9 @@ Rails.application.routes.draw do
   get "api", to: "pages#api"
   resources :categories
   resources :admin_requests, only: [:index, :create] do
+    collection do
+      get :status
+    end
     member do
       patch :approve
       patch :reject

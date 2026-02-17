@@ -6,6 +6,10 @@ class AdminRequestsController < ApplicationController
     @reviewed_requests = AdminRequest.where(status: %w[approved rejected]).includes(:user, :reviewed_by).order(reviewed_at: :desc)
   end
 
+  def status
+    render json: { admin: admin? }
+  end
+
   def create
     @admin_request = current_user_or_api_user.admin_requests.new(reason: params[:reason])
 
