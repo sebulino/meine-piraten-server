@@ -34,4 +34,39 @@ end
 
 class ActionDispatch::IntegrationTest
   include Devise::Test::IntegrationHelpers
+
+  private
+
+  def admin_auth_headers
+    admin_payload = {
+      "sub" => "keycloak-uuid-admin",
+      "email" => "admin@piratenpartei.de",
+      "name" => "Admin Pirat",
+      "preferred_username" => "adminpirat"
+    }
+    KeycloakTokenVerifier.stubs(:verify).with("admin-mock-token").returns(admin_payload)
+    { "Authorization" => "Bearer admin-mock-token" }
+  end
+
+  def superadmin_auth_headers
+    superadmin_payload = {
+      "sub" => "keycloak-uuid-superadmin",
+      "email" => "superadmin@piratenpartei.de",
+      "name" => "Superadmin Pirat",
+      "preferred_username" => "superadminpirat"
+    }
+    KeycloakTokenVerifier.stubs(:verify).with("superadmin-mock-token").returns(superadmin_payload)
+    { "Authorization" => "Bearer superadmin-mock-token" }
+  end
+
+  def regular_auth_headers
+    regular_payload = {
+      "sub" => "keycloak-uuid-1234",
+      "email" => "pirat@piratenpartei.de",
+      "name" => "Test Pirat",
+      "preferred_username" => "testpirat"
+    }
+    KeycloakTokenVerifier.stubs(:verify).with("mock-token").returns(regular_payload)
+    { "Authorization" => "Bearer mock-token" }
+  end
 end

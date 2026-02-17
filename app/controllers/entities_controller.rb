@@ -1,5 +1,6 @@
 class EntitiesController < ApplicationController
   before_action :set_entity, only: %i[ show edit update destroy ]
+  before_action :require_admin!, only: %i[ new create edit update destroy ]
 
   # GET /entities or /entities.json
   def index

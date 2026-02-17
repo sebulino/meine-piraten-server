@@ -57,10 +57,24 @@ class TaskTest < ActiveSupport::TestCase
     assert task.valid?, task.errors.full_messages.join(", ")
   end
 
-  test "claimed to done is valid" do
+  test "claimed to completed is valid" do
     task = tasks(:protokoll)
     assert_equal "claimed", task.status
+    task.status = "completed"
+    assert task.valid?, task.errors.full_messages.join(", ")
+  end
+
+  test "completed to done is valid" do
+    task = tasks(:website_update)
+    assert_equal "completed", task.status
     task.status = "done"
+    assert task.valid?, task.errors.full_messages.join(", ")
+  end
+
+  test "completed to claimed is valid" do
+    task = tasks(:website_update)
+    assert_equal "completed", task.status
+    task.status = "claimed"
     assert task.valid?, task.errors.full_messages.join(", ")
   end
 
@@ -71,10 +85,26 @@ class TaskTest < ActiveSupport::TestCase
     assert task.valid?, task.errors.full_messages.join(", ")
   end
 
+  test "claimed to done is invalid" do
+    task = tasks(:protokoll)
+    assert_equal "claimed", task.status
+    task.status = "done"
+    assert_not task.valid?
+    assert task.errors[:status].any? { |msg| msg.include?("cannot transition") }
+  end
+
   test "open to done is invalid" do
     task = tasks(:wahlkampfmaterial)
     assert_equal "open", task.status
     task.status = "done"
+    assert_not task.valid?
+    assert task.errors[:status].any? { |msg| msg.include?("cannot transition") }
+  end
+
+  test "open to completed is invalid" do
+    task = tasks(:wahlkampfmaterial)
+    assert_equal "open", task.status
+    task.status = "completed"
     assert_not task.valid?
     assert task.errors[:status].any? { |msg| msg.include?("cannot transition") }
   end

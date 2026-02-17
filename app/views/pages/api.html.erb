@@ -167,3 +167,56 @@ grant_type=client_credentials
   { "id": 1, "task_id": 1, "author_name": "...", "text": "...", ... },
   { "id": 2, "task_id": 1, "author_name": "...", "text": "...", ... }
 ]</code></pre>
+
+<hr>
+
+<h2>Admin Requests</h2>
+<p>Any authenticated user can request admin privileges. Requests are reviewed by superadmins. Approving a request automatically grants the user admin rights.</p>
+
+<h3>Endpoints</h3>
+<table>
+  <thead>
+    <tr><th>Method</th><th>Path</th><th>Description</th><th>Permission</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>POST</td><td><code>/admin_requests.json</code></td><td>Submit an admin request</td><td>Any authenticated user</td></tr>
+    <tr><td>PATCH</td><td><code>/admin_requests/:id/approve.json</code></td><td>Approve a request</td><td>Superadmin only</td></tr>
+    <tr><td>PATCH</td><td><code>/admin_requests/:id/reject.json</code></td><td>Reject a request</td><td>Superadmin only</td></tr>
+  </tbody>
+</table>
+
+<h3>Create a request</h3>
+<p>Send the <code>reason</code> as a top-level parameter:</p>
+<pre><code>POST /admin_requests.json
+Authorization: Bearer eyJhbG...
+Content-Type: application/json
+
+{
+  "reason": "Ich möchte Aufgaben für meinen KV verwalten."
+}</code></pre>
+
+<h4>Success response (201 Created)</h4>
+<pre><code>{
+  "id": 1,
+  "status": "pending",
+  "reason": "Ich möchte Aufgaben für meinen KV verwalten.",
+  "created_at": "2026-02-17T10:00:00.000Z"
+}</code></pre>
+
+<h4>Validation error (422 Unprocessable Entity)</h4>
+<pre><code>{
+  "errors": ["Reason can't be blank"]
+}</code></pre>
+
+<h3>Approve / Reject (superadmin only)</h3>
+<pre><code>PATCH /admin_requests/1/approve.json
+Authorization: Bearer eyJhbG...</code></pre>
+<p>Returns:</p>
+<pre><code>{ "status": "approved" }</code></pre>
+
+<pre><code>PATCH /admin_requests/1/reject.json
+Authorization: Bearer eyJhbG...</code></pre>
+<p>Returns:</p>
+<pre><code>{ "status": "rejected" }</code></pre>
+
+<p>Non-superadmin users receive <strong>403 Forbidden</strong> for approve/reject endpoints.</p>

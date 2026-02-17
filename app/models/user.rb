@@ -2,6 +2,8 @@ class User < ApplicationRecord
   devise :omniauthable, :trackable,
          omniauth_providers: [:openid_connect]
 
+  has_many :admin_requests
+
   validates :uid, presence: true, uniqueness: { scope: :provider }
   validates :provider, presence: true
 

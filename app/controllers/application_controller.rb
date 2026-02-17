@@ -4,6 +4,8 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate_request!
 
+  helper_method :admin?, :superadmin?
+
   private
 
   def authenticate_request!
@@ -24,6 +26,8 @@ class ApplicationController < ActionController::Base
       user.email = "dev@localhost"
       user.name = "Dev User"
       user.preferred_username = "dev"
+      user.admin = true
+      user.superadmin = true
     end
     sign_in(dev_user)
   end
@@ -43,5 +47,35 @@ class ApplicationController < ActionController::Base
     end
   rescue JWT::DecodeError, JWT::ExpiredSignature, JWT::InvalidIssuerError => e
     render json: { error: "Invalid token: #{e.message}" }, status: :unauthorized
+  end
+
+  def current_user_or_api_user
+    current_user || @current_api_user
+  end
+
+  def admin?
+    current_user_or_api_user&.admin?
+  end
+
+  def superadmin?
+    current_user_or_api_user&.superadmin?
+  end
+
+  def require_superadmin!
+    return if superadmin?
+
+    respond_to do |format|
+      format.html { redirect_to root_path, alert: "Zugriff verweigert." }
+      format.json { render json: { error: "Forbidden" }, status: :forbidden }
+    end
+  end
+
+  def require_admin!
+    return if admin?
+
+    respond_to do |format|
+      format.html { redirect_to root_path, alert: "Zugriff verweigert." }
+      format.json { render json: { error: "Forbidden" }, status: :forbidden }
+    end
   end
 end

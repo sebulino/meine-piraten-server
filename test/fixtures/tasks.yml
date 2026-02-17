@@ -54,6 +54,20 @@ social_media:
   category: oeffentlichkeitsarbeit
   entity: kv_frankfurt
 
+website_update:
+  title: Website aktualisieren
+  description: Neue Termine auf der Website eintragen.
+  completed: false
+  creator_name: pirat42
+  time_needed_in_hours: 1
+  due_date: <%= 3.days.from_now.to_date %>
+  urgent: false
+  activity_points: 5
+  status: completed
+  assignee: pirat42
+  category: verwaltung
+  entity: kv_frankfurt
+
 newsletter:
   title: Newsletter-Entwurf pruefen
   description: Korrekturlesen des monatlichen Newsletters.

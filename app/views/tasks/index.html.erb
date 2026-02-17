@@ -2,7 +2,9 @@
 
 <div class="page-header">
   <h1>Was gibt es alles zu tun?</h1>
-  <%= link_to "Neues ToDo", new_task_path, class: "btn btn-primary" %>
+  <% if admin? %>
+    <%= link_to "Neues ToDo", new_task_path, class: "btn btn-primary" %>
+  <% end %>
 </div>
 
 <table>
@@ -29,6 +31,8 @@
             <span class="badge badge-open">Offen</span>
           <% when "claimed" %>
             <span class="badge badge-claimed">Übernommen</span>
+          <% when "completed" %>
+            <span class="badge badge-completed">Abgeschlossen</span>
           <% when "done" %>
             <span class="badge badge-done">Erledigt</span>
           <% else %>

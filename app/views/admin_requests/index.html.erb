@@ -1,0 +1,66 @@
+<div class="container">
+  <div class="page-header">
+    <h1>Admin-Anfragen</h1>
+  </div>
+
+  <h2>Offene Anfragen</h2>
+  <% if @pending_requests.any? %>
+    <table>
+      <thead>
+        <tr>
+          <th>Benutzer</th>
+          <th>Begründung</th>
+          <th>Eingereicht am</th>
+          <th>Aktionen</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @pending_requests.each do |req| %>
+          <tr>
+            <td><%= req.user.preferred_username || req.user.name %></td>
+            <td><%= req.reason %></td>
+            <td><%= l(req.created_at, format: :short) %></td>
+            <td class="btn-group">
+              <%= button_to "Genehmigen", approve_admin_request_path(req), method: :patch, class: "btn btn-sm btn-primary" %>
+              <%= button_to "Ablehnen", reject_admin_request_path(req), method: :patch, class: "btn btn-sm btn-danger" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p>Keine offenen Anfragen.</p>
+  <% end %>
+
+  <h2 style="margin-top: var(--space-xl);">Bearbeitete Anfragen</h2>
+  <% if @reviewed_requests.any? %>
+    <table>
+      <thead>
+        <tr>
+          <th>Benutzer</th>
+          <th>Begründung</th>
+          <th>Status</th>
+          <th>Bearbeitet von</th>
+          <th>Bearbeitet am</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @reviewed_requests.each do |req| %>
+          <tr>
+            <td><%= req.user.preferred_username || req.user.name %></td>
+            <td><%= req.reason %></td>
+            <td>
+              <span class="badge badge-<%= req.status %>">
+                <%= req.status == "approved" ? "Genehmigt" : "Abgelehnt" %>
+              </span>
+            </td>
+            <td><%= req.reviewed_by&.preferred_username || req.reviewed_by&.name %></td>
+            <td><%= req.reviewed_at ? l(req.reviewed_at, format: :short) : "-" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p>Noch keine bearbeiteten Anfragen.</p>
+  <% end %>
+</div>

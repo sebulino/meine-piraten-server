@@ -10,7 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_15_203452) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_17_100000) do
+  create_table "admin_requests", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "reason"
+    t.datetime "reviewed_at"
+    t.integer "reviewed_by_id"
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["reviewed_by_id"], name: "index_admin_requests_on_reviewed_by_id"
+    t.index ["user_id"], name: "index_admin_requests_on_user_id"
+  end
+
   create_table "categories", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -56,6 +68,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_203452) do
   end
 
   create_table "users", force: :cascade do |t|
+    t.boolean "admin", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "current_sign_in_at"
     t.string "current_sign_in_ip"
@@ -67,6 +80,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_203452) do
     t.string "provider", default: "openid_connect", null: false
     t.text "refresh_token"
     t.integer "sign_in_count", default: 0, null: false
+    t.boolean "superadmin", default: false, null: false
     t.datetime "token_expires_at"
     t.string "uid", null: false
     t.datetime "updated_at", null: false
@@ -74,6 +88,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_203452) do
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
   end
 
+  add_foreign_key "admin_requests", "users"
+  add_foreign_key "admin_requests", "users", column: "reviewed_by_id"
   add_foreign_key "comments", "tasks"
   add_foreign_key "tasks", "categories"
   add_foreign_key "tasks", "entities"
