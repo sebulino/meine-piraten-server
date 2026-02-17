@@ -5,29 +5,31 @@
 
   <h2>Offene Anfragen</h2>
   <% if @pending_requests.any? %>
-    <table>
-      <thead>
-        <tr>
-          <th>Benutzer</th>
-          <th>Begründung</th>
-          <th>Eingereicht am</th>
-          <th>Aktionen</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @pending_requests.each do |req| %>
-          <tr>
-            <td><%= req.user.preferred_username || req.user.name %></td>
-            <td><%= req.reason %></td>
-            <td><%= l(req.created_at, format: :short) %></td>
-            <td class="btn-group">
-              <%= button_to "Genehmigen", approve_admin_request_path(req), method: :patch, class: "btn btn-sm btn-primary" %>
-              <%= button_to "Ablehnen", reject_admin_request_path(req), method: :patch, class: "btn btn-sm btn-danger" %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+    <% @pending_requests.each do |req| %>
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <strong><%= req.user.preferred_username || req.user.name %></strong>
+            &mdash; <%= req.user.email %>
+            <% if req.user.admin? %>
+              <span class="badge badge-admin">Admin</span>
+            <% else %>
+              <span class="badge badge-pending">Benutzer</span>
+            <% end %>
+          </div>
+          <small>Eingereicht am <%= l(req.created_at, format: :short) %></small>
+        </div>
+        <p style="margin: var(--space-md) 0;"><%= req.reason %></p>
+        <div class="btn-group">
+          <% if req.user.admin? %>
+            <%= button_to "Admin-Rechte entziehen", demote_admin_request_path(req), method: :patch, class: "btn btn-sm btn-danger" %>
+          <% else %>
+            <%= button_to "Zum Admin befördern", approve_admin_request_path(req), method: :patch, class: "btn btn-sm btn-primary" %>
+            <%= button_to "Ablehnen", reject_admin_request_path(req), method: :patch, class: "btn btn-sm btn-danger" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
   <% else %>
     <p>Keine offenen Anfragen.</p>
   <% end %>

@@ -182,6 +182,7 @@ grant_type=client_credentials
     <tr><td>POST</td><td><code>/admin_requests.json</code></td><td>Submit an admin request</td><td>Any authenticated user</td></tr>
     <tr><td>PATCH</td><td><code>/admin_requests/:id/approve.json</code></td><td>Approve a request</td><td>Superadmin only</td></tr>
     <tr><td>PATCH</td><td><code>/admin_requests/:id/reject.json</code></td><td>Reject a request</td><td>Superadmin only</td></tr>
+    <tr><td>PATCH</td><td><code>/admin_requests/:id/demote.json</code></td><td>Demote a user (revoke admin rights)</td><td>Superadmin only</td></tr>
   </tbody>
 </table>
 
@@ -219,4 +220,9 @@ Authorization: Bearer eyJhbG...</code></pre>
 <p>Returns:</p>
 <pre><code>{ "status": "rejected" }</code></pre>
 
-<p>Non-superadmin users receive <strong>403 Forbidden</strong> for approve/reject endpoints.</p>
+<pre><code>PATCH /admin_requests/1/demote.json
+Authorization: Bearer eyJhbG...</code></pre>
+<p>Revokes admin rights from the request's user and sets the request status to <code>rejected</code>. Returns:</p>
+<pre><code>{ "status": "rejected" }</code></pre>
+
+<p>Non-superadmin users receive <strong>403 Forbidden</strong> for approve/reject/demote endpoints.</p>
