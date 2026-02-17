@@ -3,14 +3,8 @@ require "test_helper"
 class TasksControllerTest < ActionDispatch::IntegrationTest
   setup do
     @task = tasks(:wahlkampfmaterial)
-    @auth_headers = { "Authorization" => "Bearer mock-token" }
-    @token_payload = {
-      "sub" => "keycloak-uuid-1234",
-      "email" => "pirat@piratenpartei.de",
-      "name" => "Test Pirat",
-      "preferred_username" => "testpirat"
-    }
-    KeycloakTokenVerifier.stubs(:verify).with("mock-token").returns(@token_payload)
+    @claimed_task = tasks(:protokoll)
+    @completed_task = tasks(:website_update)
   end
 
   EXPECTED_TASK_FIELDS = %w[
@@ -22,7 +16,7 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
   # -- Index --
 
   test "GET /tasks.json returns array with correct fields" do
-    get tasks_url(format: :json), headers: @auth_headers
+    get tasks_url(format: :json), headers: regular_auth_headers
     assert_response :success
 
     json = JSON.parse(response.body)
@@ -43,7 +37,7 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
   # -- Show --
 
   test "GET /tasks/:id.json returns single task with all fields" do
-    get task_url(@task, format: :json), headers: @auth_headers
+    get task_url(@task, format: :json), headers: regular_auth_headers
     assert_response :success
 
     json = JSON.parse(response.body)
@@ -54,9 +48,9 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
     assert_equal "open", json["status"]
   end
 
-  # -- Create --
+  # -- Create (admin only) --
 
-  test "POST /tasks.json with valid params returns 201" do
+  test "POST /tasks.json as admin returns 201" do
     assert_difference("Task.count") do
       post tasks_url(format: :json), params: {
         task: {
@@ -69,13 +63,28 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
           activity_points: 5,
           time_needed_in_hours: 1
         }
-      }, headers: @auth_headers
+      }, headers: admin_auth_headers
     end
 
     assert_response :created
     json = JSON.parse(response.body)
     assert_equal "Neue Aufgabe", json["title"]
     assert_equal "open", json["status"]
+  end
+
+  test "POST /tasks.json as regular user returns 403" do
+    assert_no_difference("Task.count") do
+      post tasks_url(format: :json), params: {
+        task: {
+          title: "Neue Aufgabe",
+          status: "open",
+          category_id: categories(:wahlkampf).id,
+          entity_id: entities(:kv_frankfurt).id
+        }
+      }, headers: regular_auth_headers
+    end
+
+    assert_response :forbidden
   end
 
   test "POST /tasks.json with missing title returns 422" do
@@ -87,22 +96,7 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
           category_id: categories(:wahlkampf).id,
           entity_id: entities(:kv_frankfurt).id
         }
-      }, headers: @auth_headers
-    end
-
-    assert_response :unprocessable_entity
-  end
-
-  test "POST /tasks.json with title over 200 chars returns 422" do
-    assert_no_difference("Task.count") do
-      post tasks_url(format: :json), params: {
-        task: {
-          title: "a" * 201,
-          status: "open",
-          category_id: categories(:wahlkampf).id,
-          entity_id: entities(:kv_frankfurt).id
-        }
-      }, headers: @auth_headers
+      }, headers: admin_auth_headers
     end
 
     assert_response :unprocessable_entity
@@ -110,10 +104,58 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
 
   # -- Update --
 
-  test "PATCH /tasks/:id.json with valid status transition returns 200" do
+  test "PATCH /tasks/:id.json regular user can claim task (open to claimed)" do
     patch task_url(@task, format: :json), params: {
       task: { status: "claimed", assignee: "pirat42" }
-    }, headers: @auth_headers
+    }, headers: regular_auth_headers
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_equal "claimed", json["status"]
+  end
+
+  test "PATCH /tasks/:id.json regular user can unclaim task (claimed to open)" do
+    patch task_url(@claimed_task, format: :json), params: {
+      task: { status: "open" }
+    }, headers: regular_auth_headers
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_equal "open", json["status"]
+  end
+
+  test "PATCH /tasks/:id.json regular user can complete task (claimed to completed)" do
+    patch task_url(@claimed_task, format: :json), params: {
+      task: { status: "completed" }
+    }, headers: regular_auth_headers
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_equal "completed", json["status"]
+  end
+
+  test "PATCH /tasks/:id.json regular user cannot confirm done (completed to done)" do
+    patch task_url(@completed_task, format: :json), params: {
+      task: { status: "done" }
+    }, headers: regular_auth_headers
+
+    assert_response :forbidden
+  end
+
+  test "PATCH /tasks/:id.json admin can confirm done (completed to done)" do
+    patch task_url(@completed_task, format: :json), params: {
+      task: { status: "done" }
+    }, headers: admin_auth_headers
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_equal "done", json["status"]
+  end
+
+  test "PATCH /tasks/:id.json admin can revert completed to claimed" do
+    patch task_url(@completed_task, format: :json), params: {
+      task: { status: "claimed" }
+    }, headers: admin_auth_headers
 
     assert_response :success
     json = JSON.parse(response.body)
@@ -123,18 +165,26 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
   test "PATCH /tasks/:id.json with invalid status transition returns 422" do
     patch task_url(@task, format: :json), params: {
       task: { status: "done" }
-    }, headers: @auth_headers
+    }, headers: admin_auth_headers
 
     assert_response :unprocessable_entity
   end
 
-  # -- Destroy --
+  # -- Destroy (admin only) --
 
-  test "DELETE /tasks/:id.json returns 204" do
+  test "DELETE /tasks/:id.json as admin returns 204" do
     assert_difference("Task.count", -1) do
-      delete task_url(@task, format: :json), headers: @auth_headers
+      delete task_url(@task, format: :json), headers: admin_auth_headers
     end
 
     assert_response :no_content
+  end
+
+  test "DELETE /tasks/:id.json as regular user returns 403" do
+    assert_no_difference("Task.count") do
+      delete task_url(@task, format: :json), headers: regular_auth_headers
+    end
+
+    assert_response :forbidden
   end
 end

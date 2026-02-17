@@ -18,7 +18,27 @@
 <% end %>
 
 <div class="btn-group" style="margin-top: var(--space-lg);">
-  <%= link_to "Bearbeiten", edit_task_path(@task), class: "btn btn-secondary" %>
+  <% if @task.status == "open" %>
+    <%= button_to "Übernehmen", task_path(@task), method: :patch, params: { task: { status: "claimed" } }, class: "btn btn-primary btn-sm" %>
+  <% end %>
+
+  <% if @task.status == "claimed" %>
+    <%= button_to "Freigeben", task_path(@task), method: :patch, params: { task: { status: "open" } }, class: "btn btn-secondary btn-sm" %>
+    <%= button_to "Abschließen", task_path(@task), method: :patch, params: { task: { status: "completed" } }, class: "btn btn-primary btn-sm" %>
+  <% end %>
+
+  <% if admin? %>
+    <% if @task.status == "completed" %>
+      <%= button_to "Bestätigen", task_path(@task), method: :patch, params: { task: { status: "done" } }, class: "btn btn-primary btn-sm" %>
+      <%= button_to "Zurück zu Übernommen", task_path(@task), method: :patch, params: { task: { status: "claimed" } }, class: "btn btn-secondary btn-sm" %>
+    <% end %>
+
+    <%= link_to "Bearbeiten", edit_task_path(@task), class: "btn btn-secondary" %>
+  <% end %>
+
   <%= link_to "Zurück zur Liste", tasks_path, class: "btn btn-secondary" %>
-  <%= button_to "Löschen", @task, method: :delete, class: "btn btn-danger btn-sm" %>
+
+  <% if admin? %>
+    <%= button_to "Löschen", @task, method: :delete, class: "btn btn-danger btn-sm" %>
+  <% end %>
 </div>

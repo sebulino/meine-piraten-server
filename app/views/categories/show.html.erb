@@ -5,7 +5,11 @@
 </div>
 
 <div class="btn-group">
-  <%= link_to "Bearbeiten", edit_category_path(@category), class: "btn btn-secondary" %>
+  <% if admin? %>
+    <%= link_to "Bearbeiten", edit_category_path(@category), class: "btn btn-secondary" %>
+  <% end %>
   <%= link_to "Zurück zur Liste", categories_path, class: "btn btn-secondary" %>
-  <%= button_to "Löschen", @category, method: :delete, class: "btn btn-danger btn-sm" %>
+  <% if admin? %>
+    <%= button_to "Löschen", @category, method: :delete, class: "btn btn-danger btn-sm" %>
+  <% end %>
 </div>

@@ -3,14 +3,6 @@ require "test_helper"
 class CommentsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @task = tasks(:wahlkampfmaterial)
-    @auth_headers = { "Authorization" => "Bearer mock-token" }
-    @token_payload = {
-      "sub" => "keycloak-uuid-1234",
-      "email" => "pirat@piratenpartei.de",
-      "name" => "Test Pirat",
-      "preferred_username" => "testpirat"
-    }
-    KeycloakTokenVerifier.stubs(:verify).with("mock-token").returns(@token_payload)
   end
 
   EXPECTED_COMMENT_FIELDS = %w[
@@ -20,7 +12,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
   # -- Index --
 
   test "GET /tasks/:task_id/comments.json returns array ordered by created_at" do
-    get task_comments_url(@task, format: :json), headers: @auth_headers
+    get task_comments_url(@task, format: :json), headers: regular_auth_headers
     assert_response :success
 
     json = JSON.parse(response.body)
@@ -40,7 +32,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unauthorized
   end
 
-  # -- Create --
+  # -- Create (all authenticated users) --
 
   test "POST /tasks/:task_id/comments.json with valid params returns 201" do
     assert_difference("Comment.count") do
@@ -49,7 +41,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
           author_name: "pirat42",
           text: "Neuer Kommentar"
         }
-      }, headers: @auth_headers
+      }, headers: regular_auth_headers
     end
 
     assert_response :created
@@ -65,21 +57,31 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
           author_name: "pirat42",
           text: ""
         }
-      }, headers: @auth_headers
+      }, headers: regular_auth_headers
     end
 
     assert_response :unprocessable_entity
   end
 
-  # -- Destroy --
+  # -- Destroy (admin only) --
 
-  test "DELETE /tasks/:task_id/comments/:id.json returns 204" do
+  test "DELETE /tasks/:task_id/comments/:id.json as admin returns 204" do
     comment = comments(:samstag_mitbringen)
 
     assert_difference("Comment.count", -1) do
-      delete task_comment_url(@task, comment, format: :json), headers: @auth_headers
+      delete task_comment_url(@task, comment, format: :json), headers: admin_auth_headers
     end
 
     assert_response :no_content
+  end
+
+  test "DELETE /tasks/:task_id/comments/:id.json as regular user returns 403" do
+    comment = comments(:samstag_mitbringen)
+
+    assert_no_difference("Comment.count") do
+      delete task_comment_url(@task, comment, format: :json), headers: regular_auth_headers
+    end
+
+    assert_response :forbidden
   end
 end

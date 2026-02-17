@@ -1,5 +1,6 @@
 class TasksController < ApplicationController
   before_action :set_task, only: %i[ show edit update destroy ]
+  before_action :require_admin!, only: %i[ new create edit destroy ]
 
   # GET /tasks or /tasks.json
   def index
@@ -36,8 +37,16 @@ class TasksController < ApplicationController
 
   # PATCH/PUT /tasks/1 or /tasks/1.json
   def update
+    permitted = if admin?
+      task_params
+    else
+      regular_user_update_params
+    end
+
+    return if performed?
+
     respond_to do |format|
-      if @task.update(task_params)
+      if @task.update(permitted)
         format.html { redirect_to @task, notice: "Task was successfully updated." }
         format.json { render :show, status: :ok, location: @task }
       else
@@ -66,5 +75,28 @@ class TasksController < ApplicationController
     # Only allow a list of trusted parameters through.
     def task_params
       params.expect(task: [ :title, :description, :completed, :creator_name, :time_needed_in_hours, :due_date, :activity_points, :urgent, :category_id, :entity_id, :status, :assignee ])
+    end
+
+    REGULAR_USER_TRANSITIONS = {
+      "open" => %w[claimed],
+      "claimed" => %w[open completed]
+    }.freeze
+
+    def regular_user_update_params
+      submitted = params.require(:task).permit(:status, :assignee)
+      new_status = submitted[:status]
+
+      if new_status.present?
+        allowed = REGULAR_USER_TRANSITIONS.fetch(@task.status, [])
+        unless allowed.include?(new_status)
+          respond_to do |format|
+            format.html { redirect_to @task, alert: "Zugriff verweigert." }
+            format.json { render json: { error: "Forbidden" }, status: :forbidden }
+          end
+          return {}
+        end
+      end
+
+      submitted
     end
 end

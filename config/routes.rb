@@ -13,6 +13,12 @@ Rails.application.routes.draw do
   resources :entities
   get "api", to: "pages#api"
   resources :categories
+  resources :admin_requests, only: [:index, :create] do
+    member do
+      patch :approve
+      patch :reject
+    end
+  end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

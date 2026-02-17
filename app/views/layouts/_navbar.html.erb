@@ -8,10 +8,20 @@
       <li><%= link_to "Gliederungen", entities_path %></li>
       <li><%= link_to "Kategorien", categories_path %></li>
       <li><%= link_to "API", api_path %></li>
+      <% if superadmin? %>
+        <li><%= link_to "Admin-Anfragen", admin_requests_path %></li>
+      <% end %>
     </ul>
     <ul class="navbar-user">
       <% if user_signed_in? %>
-        <li><span class="user-name"><%= current_user.preferred_username || current_user.name || current_user.email %></span></li>
+        <li>
+          <span class="user-name"><%= current_user.preferred_username || current_user.name || current_user.email %></span>
+          <% if superadmin? %>
+            <span class="badge badge-superadmin">Superadmin</span>
+          <% elsif admin? %>
+            <span class="badge badge-admin">Admin</span>
+          <% end %>
+        </li>
         <li><%= button_to "Abmelden", destroy_user_session_path, method: :delete, class: "btn-logout" %></li>
       <% else %>
         <li><%= button_to "Anmelden", user_openid_connect_omniauth_authorize_path, method: :post, class: "btn btn-primary btn-sm", form: { data: { turbo: false } } %></li>

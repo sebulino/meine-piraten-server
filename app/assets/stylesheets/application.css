@@ -297,10 +297,44 @@ tbody tr:hover {
   color: var(--success);
 }
 
+.badge-completed {
+  background: #fef3cd;
+  color: #856404;
+}
+
+.badge-admin {
+  background: var(--orange-100);
+  color: var(--orange-600);
+  font-size: 0.72rem;
+  margin-left: var(--space-xs);
+}
+
 .badge-urgent {
   background: var(--danger-bg);
   color: var(--danger);
   font-size: 0.75rem;
+}
+
+.badge-superadmin {
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-size: 0.72rem;
+  margin-left: var(--space-xs);
+}
+
+.badge-pending {
+  background: var(--info-bg);
+  color: var(--info);
+}
+
+.badge-approved {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.badge-rejected {
+  background: var(--danger-bg);
+  color: var(--danger);
 }
 
 /* ── Buttons ───────────────────────────────────────────────── */

@@ -5,3 +5,24 @@ pirat:
   name: "Test Pirat"
   preferred_username: "testpirat"
   sign_in_count: 1
+  admin: false
+
+admin_pirat:
+  provider: openid_connect
+  uid: "keycloak-uuid-admin"
+  email: "admin@piratenpartei.de"
+  name: "Admin Pirat"
+  preferred_username: "adminpirat"
+  sign_in_count: 1
+  admin: true
+  superadmin: false
+
+superadmin_pirat:
+  provider: openid_connect
+  uid: "keycloak-uuid-superadmin"
+  email: "superadmin@piratenpartei.de"
+  name: "Superadmin Pirat"
+  preferred_username: "superadminpirat"
+  sign_in_count: 1
+  admin: true
+  superadmin: true

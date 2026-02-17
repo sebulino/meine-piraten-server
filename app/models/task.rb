@@ -5,7 +5,7 @@ class Task < ApplicationRecord
 
   validates :title, presence: true, length: { maximum: 200 }
   validates :description, length: { maximum: 2000 }
-  validates :status, inclusion: { in: %w[open claimed done] }
+  validates :status, inclusion: { in: %w[open claimed completed done] }
   validate :valid_status_transition, if: :status_changed?
 
   private
@@ -15,7 +15,8 @@ class Task < ApplicationRecord
 
     allowed = {
       "open" => %w[claimed],
-      "claimed" => %w[done open],
+      "claimed" => %w[completed open],
+      "completed" => %w[done claimed],
       "done" => %w[]
     }
 
