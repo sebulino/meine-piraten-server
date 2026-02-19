@@ -1,18 +1,60 @@
 <h1>API Documentation</h1>
 
-<h2>General</h2>
+<nav>
+  <ul>
+    <li><a href="#general">General</a></li>
+    <li><a href="#authentication">Authentication</a></li>
+    <li><a href="#tasks">Tasks</a></li>
+    <li><a href="#comments">Comments</a></li>
+    <li><a href="#entities">Entities</a></li>
+    <li><a href="#categories">Categories</a></li>
+    <li><a href="#admin-requests">Admin Requests</a></li>
+  </ul>
+</nav>
+
+<hr>
+
+<h2 id="general">General</h2>
 <ul>
   <li><strong>Base URL:</strong> <code>https://meine-piraten.de</code></li>
   <li><strong>Format:</strong> JSON &mdash; append <code>.json</code> to any endpoint or send <code>Accept: application/json</code></li>
 </ul>
 
+<h3>Permission Levels</h3>
+<table>
+  <thead>
+    <tr><th>Level</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Any authenticated user</strong></td><td>Valid Bearer token required</td></tr>
+    <tr><td><strong>Admin</strong></td><td>User with admin flag set to true</td></tr>
+    <tr><td><strong>Superadmin</strong></td><td>User with superadmin flag set to true</td></tr>
+  </tbody>
+</table>
+
+<h3>Common Response Status Codes</h3>
+<table>
+  <thead>
+    <tr><th>Status</th><th>Meaning</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>200</code></td><td>OK &mdash; successful GET, PATCH, PUT</td></tr>
+    <tr><td><code>201</code></td><td>Created &mdash; successful POST</td></tr>
+    <tr><td><code>204</code></td><td>No Content &mdash; successful DELETE</td></tr>
+    <tr><td><code>401</code></td><td>Unauthorized &mdash; missing or invalid token</td></tr>
+    <tr><td><code>403</code></td><td>Forbidden &mdash; insufficient permissions</td></tr>
+    <tr><td><code>404</code></td><td>Not Found &mdash; resource does not exist</td></tr>
+    <tr><td><code>422</code></td><td>Unprocessable Entity &mdash; validation errors</td></tr>
+  </tbody>
+</table>
+
 <hr>
 
-<h2>Authentication</h2>
+<h2 id="authentication">Authentication</h2>
 <p>All API endpoints require authentication via a <strong>Bearer token</strong> (JWT) issued by PiratenSSO (Keycloak).</p>
 
 <h3>Obtaining a token</h3>
-<p>Request an access token from the PiratenSSO token endpoint using the OAuth 2.0 authorization code flow or client credentials:</p>
+<p>Request an access token from the PiratenSSO token endpoint using the OAuth 2.0 client credentials flow:</p>
 <pre><code>POST https://sso.piratenpartei.de/realms/Piratenlogin/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
@@ -28,10 +70,10 @@ grant_type=client_credentials
 }</code></pre>
 
 <h3>Using the token</h3>
-<p>Include the token in the <code>Authorization</code> header of every API request:</p>
+<p>Include the token in the <code>Authorization</code> header of every request:</p>
 <pre><code>Authorization: Bearer eyJhbGciOiJSUzI1NiIs...</code></pre>
 
-<h3>Error responses</h3>
+<h3>Authentication errors</h3>
 <table>
   <thead>
     <tr><th>Status</th><th>Body</th><th>Cause</th></tr>
@@ -49,43 +91,60 @@ grant_type=client_credentials
 
 <hr>
 
-<h2>Tasks</h2>
+<h2 id="tasks">Tasks</h2>
 <p>A task represents an actionable item assigned to an organizational entity and category.</p>
 
 <h3>Endpoints</h3>
 <table>
   <thead>
-    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><th>Method</th><th>Path</th><th>Description</th><th>Permission</th></tr>
   </thead>
   <tbody>
-    <tr><td>GET</td><td><code>/tasks.json</code></td><td>List all tasks</td></tr>
-    <tr><td>GET</td><td><code>/tasks/:id.json</code></td><td>Get a single task</td></tr>
-    <tr><td>POST</td><td><code>/tasks.json</code></td><td>Create a task</td></tr>
-    <tr><td>PATCH/PUT</td><td><code>/tasks/:id.json</code></td><td>Update a task</td></tr>
-    <tr><td>DELETE</td><td><code>/tasks/:id.json</code></td><td>Delete a task</td></tr>
+    <tr><td>GET</td><td><code>/tasks.json</code></td><td>List all tasks</td><td>Any authenticated user</td></tr>
+    <tr><td>GET</td><td><code>/tasks/:id.json</code></td><td>Get a single task</td><td>Any authenticated user</td></tr>
+    <tr><td>POST</td><td><code>/tasks.json</code></td><td>Create a task</td><td>Admin</td></tr>
+    <tr><td>PATCH/PUT</td><td><code>/tasks/:id.json</code></td><td>Update a task</td><td>Any authenticated user <em>(see field restrictions below)</em></td></tr>
+    <tr><td>DELETE</td><td><code>/tasks/:id.json</code></td><td>Delete a task</td><td>Admin</td></tr>
   </tbody>
 </table>
 
-<h3>Request Parameters (create / update)</h3>
+<h3>Request parameters (create / update)</h3>
 <p>Wrap parameters in a <code>task</code> key:</p>
 <pre><code>{
   "task": {
-    "title": "string (required, max 200 characters)",
-    "description": "text (optional, max 2000 characters)",
-    "completed": "boolean",
-    "creator_name": "string",
+    "title":               "string (required for create, max 200 characters)",
+    "description":         "string (optional, max 2000 characters)",
+    "completed":           "boolean",
+    "creator_name":        "string",
     "time_needed_in_hours": "integer (optional)",
-    "activity_points": "integer (optional)",
-    "due_date": "date (YYYY-MM-DD, optional)",
-    "urgent": "boolean (optional)",
-    "category_id": "integer (required, foreign key)",
-    "entity_id": "integer (required, foreign key)",
-    "status": "string (optional, one of: open, claimed, done; default: open)",
-    "assignee": "string (optional)"
+    "activity_points":     "integer (optional)",
+    "due_date":            "date (YYYY-MM-DD, optional)",
+    "urgent":              "boolean (optional)",
+    "category_id":         "integer (required for create, foreign key)",
+    "entity_id":           "integer (required for create, foreign key)",
+    "status":              "string (optional, see status transitions below)",
+    "assignee":            "string (optional)"
   }
 }</code></pre>
 
-<h3>Response Example (single task)</h3>
+<h4>Field update restrictions for non-admin users</h4>
+<p>Non-admin users may only update <code>status</code> and <code>assignee</code>. All other fields require admin privileges.</p>
+
+<h3>Status transitions</h3>
+<p>Task status follows a strict state machine. Invalid transitions return <strong>422 Unprocessable Entity</strong>.</p>
+<table>
+  <thead>
+    <tr><th>From</th><th>Allowed transitions</th><th>Who can transition</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>open</code></td><td><code>claimed</code></td><td>Any authenticated user</td></tr>
+    <tr><td><code>claimed</code></td><td><code>done</code>, <code>open</code></td><td>Any authenticated user</td></tr>
+    <tr><td><code>done</code></td><td><em>(none &mdash; terminal state)</em></td><td>&mdash;</td></tr>
+  </tbody>
+</table>
+<p>A task cannot go directly from <code>open</code> to <code>done</code>; it must first be <code>claimed</code>.</p>
+
+<h3>Response example (single task)</h3>
 <pre><code>{
   "id": 1,
   "title": "Wahlkampfmaterial bestellen",
@@ -105,53 +164,39 @@ grant_type=client_credentials
   "url": "https://meine-piraten.de/tasks/1.json"
 }</code></pre>
 
-<h3>Response Example (list)</h3>
+<h3>Response example (list)</h3>
 <pre><code>[
   { "id": 1, "title": "...", ... },
   { "id": 2, "title": "...", ... }
 ]</code></pre>
 
-<h3>Status Transitions</h3>
-<p>Task status follows a strict state machine. Invalid transitions return <strong>422 Unprocessable Entity</strong>.</p>
-<table>
-  <thead>
-    <tr><th>From</th><th>Allowed transitions</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><code>open</code></td><td><code>claimed</code></td></tr>
-    <tr><td><code>claimed</code></td><td><code>done</code>, <code>open</code></td></tr>
-    <tr><td><code>done</code></td><td><em>(none &mdash; terminal state)</em></td></tr>
-  </tbody>
-</table>
-<p>A task cannot go directly from <code>open</code> to <code>done</code>; it must first be <code>claimed</code>.</p>
-
 <hr>
 
-<h2>Comments</h2>
-<p>Comments are nested under tasks. Each comment belongs to a task.</p>
+<h2 id="comments">Comments</h2>
+<p>Comments are nested under tasks. Each comment belongs to a task and is ordered by creation date (ascending).</p>
 
 <h3>Endpoints</h3>
 <table>
   <thead>
-    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><th>Method</th><th>Path</th><th>Description</th><th>Permission</th></tr>
   </thead>
   <tbody>
-    <tr><td>GET</td><td><code>/tasks/:task_id/comments.json</code></td><td>List comments for a task</td></tr>
-    <tr><td>POST</td><td><code>/tasks/:task_id/comments.json</code></td><td>Create a comment on a task</td></tr>
-    <tr><td>DELETE</td><td><code>/tasks/:task_id/comments/:id.json</code></td><td>Delete a comment</td></tr>
+    <tr><td>GET</td><td><code>/tasks/:task_id/comments.json</code></td><td>List comments for a task</td><td>Any authenticated user</td></tr>
+    <tr><td>POST</td><td><code>/tasks/:task_id/comments.json</code></td><td>Create a comment</td><td>Any authenticated user</td></tr>
+    <tr><td>DELETE</td><td><code>/tasks/:task_id/comments/:id.json</code></td><td>Delete a comment</td><td>Admin</td></tr>
   </tbody>
 </table>
 
-<h3>Request Parameters (create)</h3>
+<h3>Request parameters (create)</h3>
 <p>Wrap parameters in a <code>comment</code> key:</p>
 <pre><code>{
   "comment": {
     "author_name": "string",
-    "text": "string (required)"
+    "text":        "string (required)"
   }
 }</code></pre>
 
-<h3>Response Example (single comment)</h3>
+<h3>Response example (single comment)</h3>
 <pre><code>{
   "id": 1,
   "task_id": 1,
@@ -162,7 +207,7 @@ grant_type=client_credentials
   "url": "https://meine-piraten.de/tasks/1/comments/1.json"
 }</code></pre>
 
-<h3>Response Example (list)</h3>
+<h3>Response example (list)</h3>
 <pre><code>[
   { "id": 1, "task_id": 1, "author_name": "...", "text": "...", ... },
   { "id": 2, "task_id": 1, "author_name": "...", "text": "...", ... }
@@ -170,7 +215,87 @@ grant_type=client_credentials
 
 <hr>
 
-<h2>Admin Requests</h2>
+<h2 id="entities">Entities</h2>
+<p>Entities represent organizational units (Landes-, Kreis-, or Ortsverbände). Entities can be self-referentially nested (e.g. a KV belonging to an LV).</p>
+
+<h3>Endpoints</h3>
+<table>
+  <thead>
+    <tr><th>Method</th><th>Path</th><th>Description</th><th>Permission</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>GET</td><td><code>/entities.json</code></td><td>List all entities</td><td>Any authenticated user</td></tr>
+    <tr><td>GET</td><td><code>/entities/:id.json</code></td><td>Get a single entity</td><td>Any authenticated user</td></tr>
+    <tr><td>POST</td><td><code>/entities.json</code></td><td>Create an entity</td><td>Admin</td></tr>
+    <tr><td>PATCH/PUT</td><td><code>/entities/:id.json</code></td><td>Update an entity</td><td>Admin</td></tr>
+    <tr><td>DELETE</td><td><code>/entities/:id.json</code></td><td>Delete an entity</td><td>Admin</td></tr>
+  </tbody>
+</table>
+
+<h3>Request parameters (create / update)</h3>
+<p>Wrap parameters in an <code>entity</code> key:</p>
+<pre><code>{
+  "entity": {
+    "name":      "string (required)",
+    "LV":        "boolean (Landesverband)",
+    "KV":        "boolean (Kreisverband)",
+    "OV":        "boolean (Ortsverband)",
+    "entity_id": "integer (optional, parent entity foreign key)"
+  }
+}</code></pre>
+
+<h3>Response example (single entity)</h3>
+<pre><code>{
+  "id": 1,
+  "name": "Piratenpartei Bayern",
+  "LV": true,
+  "KV": false,
+  "OV": false,
+  "entity_id": null,
+  "created_at": "2025-01-01T00:00:00.000Z",
+  "updated_at": "2025-01-01T00:00:00.000Z",
+  "url": "https://meine-piraten.de/entities/1.json"
+}</code></pre>
+
+<hr>
+
+<h2 id="categories">Categories</h2>
+<p>Categories are used to classify tasks.</p>
+
+<h3>Endpoints</h3>
+<table>
+  <thead>
+    <tr><th>Method</th><th>Path</th><th>Description</th><th>Permission</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>GET</td><td><code>/categories.json</code></td><td>List all categories</td><td>Any authenticated user</td></tr>
+    <tr><td>GET</td><td><code>/categories/:id.json</code></td><td>Get a single category</td><td>Any authenticated user</td></tr>
+    <tr><td>POST</td><td><code>/categories.json</code></td><td>Create a category</td><td>Admin</td></tr>
+    <tr><td>PATCH/PUT</td><td><code>/categories/:id.json</code></td><td>Update a category</td><td>Admin</td></tr>
+    <tr><td>DELETE</td><td><code>/categories/:id.json</code></td><td>Delete a category</td><td>Admin</td></tr>
+  </tbody>
+</table>
+
+<h3>Request parameters (create / update)</h3>
+<p>Wrap parameters in a <code>category</code> key:</p>
+<pre><code>{
+  "category": {
+    "name": "string (required)"
+  }
+}</code></pre>
+
+<h3>Response example (single category)</h3>
+<pre><code>{
+  "id": 1,
+  "name": "Öffentlichkeitsarbeit",
+  "created_at": "2025-01-01T00:00:00.000Z",
+  "updated_at": "2025-01-01T00:00:00.000Z",
+  "url": "https://meine-piraten.de/categories/1.json"
+}</code></pre>
+
+<hr>
+
+<h2 id="admin-requests">Admin Requests</h2>
 <p>Any authenticated user can request admin privileges. Requests are reviewed by superadmins. Approving a request automatically grants the user admin rights.</p>
 
 <h3>Endpoints</h3>
@@ -179,14 +304,21 @@ grant_type=client_credentials
     <tr><th>Method</th><th>Path</th><th>Description</th><th>Permission</th></tr>
   </thead>
   <tbody>
+    <tr><td>GET</td><td><code>/admin_requests/status.json</code></td><td>Check your own admin status</td><td>Any authenticated user</td></tr>
     <tr><td>POST</td><td><code>/admin_requests.json</code></td><td>Submit an admin request</td><td>Any authenticated user</td></tr>
-    <tr><td>PATCH</td><td><code>/admin_requests/:id/approve.json</code></td><td>Approve a request</td><td>Superadmin only</td></tr>
-    <tr><td>PATCH</td><td><code>/admin_requests/:id/reject.json</code></td><td>Reject a request</td><td>Superadmin only</td></tr>
-    <tr><td>PATCH</td><td><code>/admin_requests/:id/demote.json</code></td><td>Demote a user (revoke admin rights)</td><td>Superadmin only</td></tr>
+    <tr><td>PATCH</td><td><code>/admin_requests/:id/approve.json</code></td><td>Approve a request</td><td>Superadmin</td></tr>
+    <tr><td>PATCH</td><td><code>/admin_requests/:id/reject.json</code></td><td>Reject a request</td><td>Superadmin</td></tr>
+    <tr><td>PATCH</td><td><code>/admin_requests/:id/demote.json</code></td><td>Revoke admin rights from a user</td><td>Superadmin</td></tr>
   </tbody>
 </table>
 
-<h3>Create a request</h3>
+<h3>Check admin status</h3>
+<pre><code>GET /admin_requests/status.json
+Authorization: Bearer eyJhbG...</code></pre>
+<p>Returns:</p>
+<pre><code>{ "admin": true }</code></pre>
+
+<h3>Submit a request</h3>
 <p>Send the <code>reason</code> as a top-level parameter:</p>
 <pre><code>POST /admin_requests.json
 Authorization: Bearer eyJhbG...
@@ -209,20 +341,20 @@ Content-Type: application/json
   "errors": ["Reason can't be blank"]
 }</code></pre>
 
-<h3>Approve / Reject (superadmin only)</h3>
+<h3>Approve / Reject / Demote (superadmin only)</h3>
 <pre><code>PATCH /admin_requests/1/approve.json
 Authorization: Bearer eyJhbG...</code></pre>
-<p>Returns:</p>
+<p>Grants admin rights to the request's user. Returns:</p>
 <pre><code>{ "status": "approved" }</code></pre>
 
 <pre><code>PATCH /admin_requests/1/reject.json
 Authorization: Bearer eyJhbG...</code></pre>
-<p>Returns:</p>
+<p>Rejects the request without changing user permissions. Returns:</p>
 <pre><code>{ "status": "rejected" }</code></pre>
 
 <pre><code>PATCH /admin_requests/1/demote.json
 Authorization: Bearer eyJhbG...</code></pre>
-<p>Revokes admin rights from the request's user and sets the request status to <code>rejected</code>. Returns:</p>
+<p>Revokes admin rights from the request's user and marks the request as rejected. Returns:</p>
 <pre><code>{ "status": "rejected" }</code></pre>
 
-<p>Non-superadmin users receive <strong>403 Forbidden</strong> for approve/reject/demote endpoints.</p>
+<p>Non-superadmin users receive <strong>403 Forbidden</strong> for approve / reject / demote endpoints.</p>
