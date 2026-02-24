@@ -13,6 +13,10 @@ Rails.application.routes.draw do
   resources :entities
   get "api", to: "pages#api"
   resources :categories
+
+  namespace :api do
+    resources :news, only: [ :index ]
+  end
   resources :admin_requests, only: [:index, :create] do
     collection do
       get :status
