@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_17_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_24_203129) do
   create_table "admin_requests", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "reason"
@@ -27,6 +27,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_100000) do
     t.datetime "created_at", null: false
     t.string "name"
     t.datetime "updated_at", null: false
+  end
+
+  create_table "channel_posts", force: :cascade do |t|
+    t.integer "chat_id", limit: 8, null: false
+    t.datetime "created_at", null: false
+    t.integer "message_id", limit: 8, null: false
+    t.datetime "posted_at", null: false
+    t.json "raw_json"
+    t.text "text"
+    t.datetime "updated_at", null: false
+    t.index ["chat_id", "message_id"], name: "index_channel_posts_on_chat_id_and_message_id", unique: true
+    t.index ["chat_id"], name: "index_channel_posts_on_chat_id"
+    t.index ["message_id"], name: "index_channel_posts_on_message_id"
+    t.index ["posted_at"], name: "index_channel_posts_on_posted_at"
   end
 
   create_table "comments", force: :cascade do |t|
@@ -65,6 +79,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_100000) do
     t.boolean "urgent"
     t.index ["category_id"], name: "index_tasks_on_category_id"
     t.index ["entity_id"], name: "index_tasks_on_entity_id"
+  end
+
+  create_table "telegram_cursors", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "last_update_id", limit: 8, default: 0, null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_telegram_cursors_on_name", unique: true
   end
 
   create_table "users", force: :cascade do |t|

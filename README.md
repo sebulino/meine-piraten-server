@@ -39,6 +39,56 @@ Task management and team coordination platform for the Piratenpartei (Pirate Par
 - API documentation available at `/api` in the web UI
 - Endpoints: tasks (CRUD), comments (list/create/delete), admin requests (create)
 
+### Telegram News Channel (News-Kombüse)
+
+The app polls the Telegram channel "News-Kombüse" for new posts and exposes them via a public JSON endpoint for the iOS app.
+
+**Required environment variables** (add to `rails.env` / docker-compose env_file):
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `TELEGRAM_BOT_TOKEN` | Yes | — | Bot API token (from @BotFather) |
+| `TELEGRAM_POLL_TIMEOUT` | No | `30` | Long-poll timeout in seconds |
+| `TELEGRAM_ALLOWED_UPDATES` | No | `["channel_post","edited_channel_post"]` | Update types to subscribe to |
+| `TELEGRAM_POLL_ENABLED` | No | `true` | Set to `false` to disable polling |
+
+**Running the poller:**
+
+```sh
+# Single poll cycle (use with cron / systemd timer / k8s CronJob):
+bin/rails runner 'puts Telegram::ChannelPoller.new.poll_once'
+
+# Or via the job wrapper:
+bin/rails runner 'TelegramPollJob.perform_now'
+```
+
+> **Important:** Only one instance/container should run polling to avoid competing consumers. If the app is scaled horizontally, ensure a singleton poller.
+
+**API endpoint:**
+
+```sh
+# Latest 50 news posts (no auth required):
+curl https://meine-piraten.de/api/news.json
+
+# With custom limit (max 200):
+curl https://meine-piraten.de/api/news.json?limit=100
+```
+
+**Sanity checks (Rails console):**
+
+```ruby
+# Run a poll cycle:
+Telegram::ChannelPoller.new.poll_once
+
+# Verify stored posts:
+ChannelPost.count
+ChannelPost.last
+
+# Verify API response:
+app.get '/api/news.json'
+app.response.body
+```
+
 ## Tech Stack
 
 - **Framework:** Ruby on Rails 8.1
