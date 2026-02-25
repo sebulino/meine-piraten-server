@@ -8,6 +8,7 @@ module Telegram
 
     def initialize
       @token   = ENV.fetch("TELEGRAM_BOT_TOKEN")
+      @chat_id = Integer(ENV.fetch("TELEGRAM_CHAT_ID"))
       @timeout = ENV.fetch("TELEGRAM_POLL_TIMEOUT", "30").to_i
       @allowed_updates = JSON.parse(
         ENV.fetch("TELEGRAM_ALLOWED_UPDATES", '["channel_post","edited_channel_post"]')
@@ -18,6 +19,7 @@ module Telegram
     # Returns the number of processed updates.
     def poll_once
       cursor = TelegramCursor.find_or_create_by!(name: CURSOR_NAME)
+      cursor.update!(last_update_id: 0) if cursor.last_update_id.nil?
       offset = cursor.last_update_id + 1
 
       updates = fetch_updates(offset)
@@ -35,6 +37,9 @@ module Telegram
 
         chat = post["chat"] || post["sender_chat"]
         next if chat.nil?
+
+        chat_id = chat["id"]
+        next unless chat_id == @chat_id
 
         posts_to_upsert << {
           chat_id:    chat["id"],
