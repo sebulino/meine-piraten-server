@@ -18,6 +18,7 @@ module Telegram
     # Performs a single long-poll cycle and persists new/edited channel posts.
     # Returns the number of processed updates.
     def poll_once
+      Rails.logger.info "ChannelPoller: starting poll cycle"
       cursor = TelegramCursor.find_or_create_by!(name: CURSOR_NAME)
       cursor.update!(last_update_id: 0) if cursor.last_update_id.nil?
       offset = cursor.last_update_id + 1
@@ -61,6 +62,7 @@ module Telegram
         cursor.update!(last_update_id: max_update_id)
       end
 
+      Rails.logger.info "ChannelPoller: processed #{posts_to_upsert.size} posts"
       posts_to_upsert.size
     end
 
@@ -82,6 +84,9 @@ module Telegram
       end
 
       body["result"] || []
+    rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, Errno::ECONNREFUSED, JSON::ParserError => e
+      Rails.logger.error "ChannelPoller: fetch_updates failed (#{e.class}): #{e.message}"
+      []
     end
   end
 end

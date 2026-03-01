@@ -2,3 +2,6 @@ production:
   telegram_poll:
     class: TelegramPollJob
     schedule: every 5 minutes
+  channel_posts_cleanup:
+    class: ChannelPostsCleanupJob
+    schedule: every day at 3am
