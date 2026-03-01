@@ -4,7 +4,7 @@ module Api
 
     def index
       limit = [ (params[:limit] || 50).to_i, 200 ].min
-      posts = ChannelPost.order(posted_at: :desc).limit(limit)
+      posts = ChannelPost.recent.order(posted_at: :desc).limit(limit)
 
       render json: posts.map { |p|
         {
