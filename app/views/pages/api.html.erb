@@ -8,6 +8,7 @@
     <li><a href="#comments">Comments</a></li>
     <li><a href="#entities">Entities</a></li>
     <li><a href="#categories">Categories</a></li>
+    <li><a href="#news">News</a></li>
     <li><a href="#admin-requests">Admin Requests</a></li>
   </ul>
 </nav>
@@ -292,6 +293,53 @@ grant_type=client_credentials
   "updated_at": "2025-01-01T00:00:00.000Z",
   "url": "https://meine-piraten.de/categories/1.json"
 }</code></pre>
+
+<hr>
+
+<h2 id="news">News</h2>
+<p>News posts are sourced from Telegram channel updates. This endpoint is <strong>public</strong> and does not require authentication.</p>
+
+<h3>Endpoints</h3>
+<table>
+  <thead>
+    <tr><th>Method</th><th>Path</th><th>Description</th><th>Permission</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>GET</td><td><code>/api/news.json</code></td><td>List recent news posts</td><td>Public (no authentication required)</td></tr>
+  </tbody>
+</table>
+
+<h3>Query parameters</h3>
+<table>
+  <thead>
+    <tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>limit</code></td><td>integer</td><td>50</td><td>Number of posts to return (max 200)</td></tr>
+  </tbody>
+</table>
+
+<h3>Example request</h3>
+<pre><code>curl -H "Accept: application/json" \
+     https://meine-piraten.de/api/news.json?limit=10</code></pre>
+
+<h3>Response example (list)</h3>
+<pre><code>[
+  {
+    "chat_id": -1001234567890,
+    "message_id": 42,
+    "posted_at": "2026-03-01T14:30:00Z",
+    "text": "Neuer Blogpost: Unsere Positionen zur Digitalpolitik..."
+  },
+  {
+    "chat_id": -1001234567890,
+    "message_id": 41,
+    "posted_at": "2026-02-28T10:00:00Z",
+    "text": "Einladung zum nächsten Stammtisch..."
+  }
+]</code></pre>
+
+<p>Posts are ordered by <code>posted_at</code> descending (newest first) and limited to posts from the last 30 days.</p>
 
 <hr>
 
