@@ -7,6 +7,7 @@
 app/.DS_Store
 db/.DS_Store
 test/.DS_Store
+config/.DS_Store
 
 # Ignore bundler config.
 /.bundle
@@ -37,6 +38,8 @@ Gemfile.lock
 !/tmp/storage/.keep
 
 /public/assets
+
+CLAUDE.md
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key

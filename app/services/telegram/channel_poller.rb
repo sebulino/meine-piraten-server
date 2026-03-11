@@ -18,10 +18,14 @@ module Telegram
     # Performs a single long-poll cycle and persists new/edited channel posts.
     # Returns the number of processed updates.
     def poll_once
-      Rails.logger.info "ChannelPoller: starting poll cycle"
+      Rails.logger.info "ChannelPoller: starting poll cycle (chat_id=#{@chat_id})"
+
+      check_and_clear_webhook
+
       cursor = TelegramCursor.find_or_create_by!(name: CURSOR_NAME)
       cursor.update!(last_update_id: 0) if cursor.last_update_id.nil?
       offset = cursor.last_update_id + 1
+      Rails.logger.info "ChannelPoller: polling with offset=#{offset}"
 
       updates = fetch_updates(offset)
       return 0 if updates.empty?
@@ -67,6 +71,27 @@ module Telegram
     end
 
     private
+
+    def check_and_clear_webhook
+      uri = URI("https://api.telegram.org/bot#{@token}/getWebhookInfo")
+      response = Net::HTTP.get_response(uri)
+      body = JSON.parse(response.body)
+
+      return unless body["ok"]
+
+      webhook_url = body.dig("result", "url").to_s
+      return if webhook_url.empty?
+
+      Rails.logger.warn "ChannelPoller: active webhook detected (#{webhook_url}) — getUpdates will not work"
+
+      if ENV["TELEGRAM_AUTO_CLEAR_WEBHOOK"] == "true"
+        Rails.logger.warn "ChannelPoller: auto-clearing webhook (TELEGRAM_AUTO_CLEAR_WEBHOOK=true)"
+        delete_uri = URI("https://api.telegram.org/bot#{@token}/deleteWebhook")
+        Net::HTTP.get_response(delete_uri)
+      end
+    rescue StandardError => e
+      Rails.logger.error "ChannelPoller: webhook check failed (#{e.class}): #{e.message}"
+    end
 
     def fetch_updates(offset)
       uri = URI("https://api.telegram.org/bot#{@token}/getUpdates")
