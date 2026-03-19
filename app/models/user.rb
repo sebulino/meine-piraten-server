@@ -4,7 +4,7 @@ class User < ApplicationRecord
 
   has_many :admin_requests
   has_many :push_subscriptions, dependent: :destroy
-  has_many :assigned_tasks, class_name: "Task", foreign_key: :assignee_id, dependent: :nullify
+  has_many :assigned_tasks, class_name: "Task", foreign_key: :assignee, primary_key: :preferred_username, dependent: :nullify
   has_many :sent_messages, class_name: "Message", foreign_key: :sender_id, dependent: :destroy
   has_many :received_messages, class_name: "Message", foreign_key: :recipient_id, dependent: :destroy
 

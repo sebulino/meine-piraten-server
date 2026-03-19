@@ -1,7 +1,6 @@
 class Task < ApplicationRecord
   belongs_to :category
   belongs_to :entity
-  belongs_to :assignee, class_name: "User", optional: true
   has_many :comments, dependent: :destroy
 
   validates :title, presence: true, length: { maximum: 200 }
@@ -15,13 +14,14 @@ class Task < ApplicationRecord
   private
 
   def notify_worthy_change?
-    saved_change_to_status? || saved_change_to_assignee_id?
+    saved_change_to_status? || saved_change_to_assignee?
   end
 
   def notify_todo_subscribers
+    target_user = User.find_by(preferred_username: assignee) if assignee.present?
     PushNotificationJob.perform_later(
       category: "todos",
-      user_id: assignee_id,
+      user_id: target_user&.id,
       extra: { deepLink: "todo", todoId: id }
     )
   end

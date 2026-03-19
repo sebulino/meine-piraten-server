@@ -41,7 +41,7 @@
         </td>
         <td><%= task.category.name if task.category %></td>
         <td><%= task.entity.name if task.entity %></td>
-        <td><%= task.assignee&.name %></td>
+        <td><%= task.assignee %></td>
         <td><%= task.urgent ? raw('<span class="badge badge-urgent">Dringend</span>') : "" %></td>
         <td><%= "#{task.time_needed_in_hours} Std." if task.time_needed_in_hours %></td>
         <td><%= task.due_date&.strftime("%d.%m.%Y") %></td>

@@ -17,7 +17,7 @@ class TaskNotificationTest < ActiveSupport::TestCase
     task = tasks(:wahlkampfmaterial)
 
     assert_enqueued_with(job: PushNotificationJob) do
-      task.update!(status: "claimed", assignee_id: users(:pirat).id)
+      task.update!(status: "claimed", assignee: "testpirat")
     end
   end
 

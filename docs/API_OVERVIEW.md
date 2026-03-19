@@ -56,7 +56,7 @@ Wrap parameters in a `task` key:
     "category_id": "integer (required, foreign key)",
     "entity_id": "integer (required, foreign key)",
     "status": "string (optional, one of: open, claimed, completed, done; default: open; see status transitions below)",
-    "assignee_id": "integer (optional, foreign key → users)"
+    "assignee": "string (optional, PiratenSSO username)"
   }
 }
 ```
@@ -77,8 +77,7 @@ Wrap parameters in a `task` key:
   "category_id": 1,
   "entity_id": 1,
   "status": "open",
-  "assignee_id": null,
-  "assignee_name": null,
+  "assignee": null,
   "created_at": "2025-05-04T12:00:00.000Z",
   "updated_at": "2025-05-04T12:00:00.000Z",
   "url": "https://meine-piraten.de/tasks/1.json"
@@ -363,7 +362,7 @@ Comments are nested under tasks. Each comment belongs to a task.
 | activity_points | integer | |
 | category_id | integer | not null, foreign key → categories |
 | entity_id | integer | not null, foreign key → entities |
-| assignee_id | integer | nullable, foreign key → users |
+| assignee | string | nullable, PiratenSSO username |
 | due_date | date | |
 | urgent | boolean | |
 | status | string | default: "open", validated: open/claimed/completed/done |
