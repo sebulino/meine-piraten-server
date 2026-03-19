@@ -22,23 +22,23 @@ end
 
 # --- Entities (hierarchical) ---
 lv_hessen = Entity.find_or_create_by!(name: "LV Hessen") do |e|
-  e.LV = true; e.OV = false; e.KV = false; e.entity_id = nil
+  e.entity_level = "LV"; e.entity_id = nil
 end
 
 kv_frankfurt = Entity.find_or_create_by!(name: "KV Frankfurt") do |e|
-  e.LV = false; e.OV = false; e.KV = true; e.entity_id = lv_hessen.id
+  e.entity_level = "KV"; e.entity_id = lv_hessen.id
 end
 
 lv_bayern = Entity.find_or_create_by!(name: "LV Bayern") do |e|
-  e.LV = true; e.OV = false; e.KV = false; e.entity_id = nil
+  e.entity_level = "LV"; e.entity_id = nil
 end
 
 kv_muenchen = Entity.find_or_create_by!(name: "KV Muenchen") do |e|
-  e.LV = false; e.OV = false; e.KV = true; e.entity_id = lv_bayern.id
+  e.entity_level = "KV"; e.entity_id = lv_bayern.id
 end
 
 ov_schwabing = Entity.find_or_create_by!(name: "OV Schwabing") do |e|
-  e.LV = false; e.OV = true; e.KV = false; e.entity_id = kv_muenchen.id
+  e.entity_level = "OV"; e.entity_id = kv_muenchen.id
 end
 
 # --- Tasks ---

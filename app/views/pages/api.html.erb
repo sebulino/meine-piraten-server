@@ -237,11 +237,9 @@ grant_type=client_credentials
 <p>Wrap parameters in an <code>entity</code> key:</p>
 <pre><code>{
   "entity": {
-    "name":      "string (required)",
-    "LV":        "boolean (Landesverband)",
-    "KV":        "boolean (Kreisverband)",
-    "OV":        "boolean (Ortsverband)",
-    "entity_id": "integer (optional, parent entity foreign key)"
+    "name":         "string (required)",
+    "entity_level": "string (one of: LV, KV, OV)",
+    "entity_id":    "integer (optional, parent entity foreign key)"
   }
 }</code></pre>
 
@@ -249,9 +247,7 @@ grant_type=client_credentials
 <pre><code>{
   "id": 1,
   "name": "Piratenpartei Bayern",
-  "LV": true,
-  "KV": false,
-  "OV": false,
+  "entity_level": "LV",
   "entity_id": null,
   "created_at": "2025-01-01T00:00:00.000Z",
   "updated_at": "2025-01-01T00:00:00.000Z",

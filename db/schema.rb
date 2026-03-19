@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_19_100001) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_19_200000) do
   create_table "admin_requests", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "reason"
@@ -53,11 +53,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_19_100001) do
   end
 
   create_table "entities", force: :cascade do |t|
-    t.boolean "KV"
-    t.boolean "LV"
-    t.boolean "OV"
     t.datetime "created_at", null: false
     t.integer "entity_id"
+    t.string "entity_level"
     t.string "name"
     t.datetime "updated_at", null: false
   end

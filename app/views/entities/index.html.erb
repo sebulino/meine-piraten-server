@@ -11,9 +11,7 @@
   <thead>
     <tr>
       <th>Name</th>
-      <th>LV</th>
-      <th>OV</th>
-      <th>KV</th>
+      <th>Gliederungsebene</th>
       <th>Übergeordnete Gliederung</th>
     </tr>
   </thead>
@@ -22,9 +20,7 @@
     <% @entities.each do |entity| %>
       <tr>
         <td><%= link_to entity.name, entity %></td>
-        <td><%= entity.LV ? "Ja" : "" %></td>
-        <td><%= entity.OV ? "Ja" : "" %></td>
-        <td><%= entity.KV ? "Ja" : "" %></td>
+        <td><%= entity.entity_level_label %></td>
         <td><%= Entity.find_by(id: entity.entity_id)&.name %></td>
       </tr>
     <% end %>

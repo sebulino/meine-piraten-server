@@ -247,13 +247,13 @@ An entity represents an organizational unit (e.g. Kreisverband, Landesverband, O
 {
   "entity": {
     "name": "string",
-    "LV": "boolean",
-    "OV": "boolean",
-    "KV": "boolean",
+    "entity_level": "string (one of: LV, KV, OV)",
     "entity_id": "integer (optional, self-referencing parent entity)"
   }
 }
 ```
+
+`entity_level` values: `LV` (Landesverband), `KV` (Kreisverband), `OV` (Ortsverband).
 
 #### Response Shape (single entity)
 
@@ -261,9 +261,7 @@ An entity represents an organizational unit (e.g. Kreisverband, Landesverband, O
 {
   "id": 1,
   "name": "KV Frankfurt",
-  "LV": false,
-  "OV": false,
-  "KV": true,
+  "entity_level": "KV",
   "entity_id": 2,
   "created_at": "2025-04-04T14:07:33.000Z",
   "updated_at": "2025-04-04T14:07:33.000Z",
@@ -405,9 +403,7 @@ Comments are nested under tasks. Each comment belongs to a task.
 |--------|------|-------------|
 | id | integer | primary key, auto-increment |
 | name | string | |
-| LV | boolean | Landesverband flag |
-| OV | boolean | Ortsverband flag |
-| KV | boolean | Kreisverband flag |
+| entity_level | string | one of: LV (Landesverband), KV (Kreisverband), OV (Ortsverband) |
 | entity_id | integer | self-referencing parent entity |
 | created_at | datetime | not null |
 | updated_at | datetime | not null |
