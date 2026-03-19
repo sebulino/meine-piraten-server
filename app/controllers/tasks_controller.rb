@@ -74,7 +74,7 @@ class TasksController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def task_params
-      params.expect(task: [ :title, :description, :completed, :creator_name, :time_needed_in_hours, :due_date, :activity_points, :urgent, :category_id, :entity_id, :status, :assignee_id ])
+      params.expect(task: [ :title, :description, :completed, :creator_name, :time_needed_in_hours, :due_date, :activity_points, :urgent, :category_id, :entity_id, :status, :assignee ])
     end
 
     REGULAR_USER_TRANSITIONS = {
@@ -83,7 +83,7 @@ class TasksController < ApplicationController
     }.freeze
 
     def regular_user_update_params
-      submitted = params.require(:task).permit(:status, :assignee_id)
+      submitted = params.require(:task).permit(:status, :assignee)
       new_status = submitted[:status]
 
       if new_status.present?

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_19_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_19_200001) do
   create_table "admin_requests", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "reason"
@@ -88,7 +88,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_19_200000) do
 
   create_table "tasks", force: :cascade do |t|
     t.integer "activity_points"
-    t.integer "assignee_id"
+    t.string "assignee"
     t.integer "category_id", null: false
     t.boolean "completed"
     t.datetime "created_at", null: false
@@ -101,7 +101,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_19_200000) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.boolean "urgent"
-    t.index ["assignee_id"], name: "index_tasks_on_assignee_id"
     t.index ["category_id"], name: "index_tasks_on_category_id"
     t.index ["entity_id"], name: "index_tasks_on_entity_id"
   end
@@ -143,5 +142,4 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_19_200000) do
   add_foreign_key "push_subscriptions", "users"
   add_foreign_key "tasks", "categories"
   add_foreign_key "tasks", "entities"
-  add_foreign_key "tasks", "users", column: "assignee_id"
 end

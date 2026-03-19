@@ -127,12 +127,12 @@ grant_type=client_credentials
     "category_id":         "integer (required for create, foreign key)",
     "entity_id":           "integer (required for create, foreign key)",
     "status":              "string (optional, see status transitions below)",
-    "assignee_id":         "integer (optional, foreign key to users)"
+    "assignee":            "string (optional, PiratenSSO username)"
   }
 }</code></pre>
 
 <h4>Field update restrictions for non-admin users</h4>
-<p>Non-admin users may only update <code>status</code> and <code>assignee_id</code>. All other fields require admin privileges.</p>
+<p>Non-admin users may only update <code>status</code> and <code>assignee</code>. All other fields require admin privileges.</p>
 
 <h3>Status transitions</h3>
 <p>Task status follows a strict state machine. Invalid transitions return <strong>422 Unprocessable Entity</strong>.</p>
@@ -162,8 +162,7 @@ grant_type=client_credentials
   "category_id": 1,
   "entity_id": 1,
   "status": "open",
-  "assignee_id": null,
-  "assignee_name": null,
+  "assignee": null,
   "created_at": "2025-05-04T12:00:00.000Z",
   "updated_at": "2025-05-04T12:00:00.000Z",
   "url": "https://meine-piraten.de/tasks/1.json"

@@ -31,8 +31,8 @@
   </div>
 
   <div class="form-group">
-    <%= form.label :assignee_id, "Zugewiesen an" %>
-    <%= form.collection_select(:assignee_id, User.all, :id, :name, { prompt: "Niemand", include_blank: false }, {}) %>
+    <%= form.label :assignee, "Zugewiesen an (PiratenSSO Benutzername)" %>
+    <%= form.text_field :assignee %>
   </div>
 
   <div class="form-group">
