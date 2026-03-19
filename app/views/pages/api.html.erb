@@ -6,9 +6,11 @@
     <li><a href="#authentication">Authentication</a></li>
     <li><a href="#tasks">Tasks</a></li>
     <li><a href="#comments">Comments</a></li>
+    <li><a href="#messages">Messages</a></li>
     <li><a href="#entities">Entities</a></li>
     <li><a href="#categories">Categories</a></li>
     <li><a href="#news">News</a></li>
+    <li><a href="#push-subscriptions">Push Subscriptions</a></li>
     <li><a href="#admin-requests">Admin Requests</a></li>
   </ul>
 </nav>
@@ -27,6 +29,7 @@
     <tr><th>Level</th><th>Description</th></tr>
   </thead>
   <tbody>
+    <tr><td><strong>Public</strong></td><td>No authentication required</td></tr>
     <tr><td><strong>Any authenticated user</strong></td><td>Valid Bearer token required</td></tr>
     <tr><td><strong>Admin</strong></td><td>User with admin flag set to true</td></tr>
     <tr><td><strong>Superadmin</strong></td><td>User with superadmin flag set to true</td></tr>
@@ -52,7 +55,7 @@
 <hr>
 
 <h2 id="authentication">Authentication</h2>
-<p>All API endpoints require authentication via a <strong>Bearer token</strong> (JWT) issued by PiratenSSO (Keycloak).</p>
+<p>All API endpoints require authentication via a <strong>Bearer token</strong> (JWT) issued by PiratenSSO (Keycloak), unless marked as public.</p>
 
 <h3>Obtaining a token</h3>
 <p>Request an access token from the PiratenSSO token endpoint using the OAuth 2.0 client credentials flow:</p>
@@ -124,12 +127,12 @@ grant_type=client_credentials
     "category_id":         "integer (required for create, foreign key)",
     "entity_id":           "integer (required for create, foreign key)",
     "status":              "string (optional, see status transitions below)",
-    "assignee":            "string (optional)"
+    "assignee_id":         "integer (optional, foreign key to users)"
   }
 }</code></pre>
 
 <h4>Field update restrictions for non-admin users</h4>
-<p>Non-admin users may only update <code>status</code> and <code>assignee</code>. All other fields require admin privileges.</p>
+<p>Non-admin users may only update <code>status</code> and <code>assignee_id</code>. All other fields require admin privileges.</p>
 
 <h3>Status transitions</h3>
 <p>Task status follows a strict state machine. Invalid transitions return <strong>422 Unprocessable Entity</strong>.</p>
@@ -139,11 +142,11 @@ grant_type=client_credentials
   </thead>
   <tbody>
     <tr><td><code>open</code></td><td><code>claimed</code></td><td>Any authenticated user</td></tr>
-    <tr><td><code>claimed</code></td><td><code>done</code>, <code>open</code></td><td>Any authenticated user</td></tr>
+    <tr><td><code>claimed</code></td><td><code>completed</code>, <code>open</code></td><td>Any authenticated user</td></tr>
+    <tr><td><code>completed</code></td><td><code>done</code>, <code>claimed</code></td><td>Admin only</td></tr>
     <tr><td><code>done</code></td><td><em>(none &mdash; terminal state)</em></td><td>&mdash;</td></tr>
   </tbody>
 </table>
-<p>A task cannot go directly from <code>open</code> to <code>done</code>; it must first be <code>claimed</code>.</p>
 
 <h3>Response example (single task)</h3>
 <pre><code>{
@@ -151,7 +154,7 @@ grant_type=client_credentials
   "title": "Wahlkampfmaterial bestellen",
   "description": "Flyer und Plakate für den Wahlkampf bestellen",
   "completed": false,
-  "creator_name": "Max Mustermann",
+  "creator_name": "pirat42",
   "time_needed_in_hours": 2,
   "due_date": "2025-06-01",
   "urgent": true,
@@ -159,17 +162,12 @@ grant_type=client_credentials
   "category_id": 1,
   "entity_id": 1,
   "status": "open",
-  "assignee": null,
+  "assignee_id": null,
+  "assignee_name": null,
   "created_at": "2025-05-04T12:00:00.000Z",
   "updated_at": "2025-05-04T12:00:00.000Z",
   "url": "https://meine-piraten.de/tasks/1.json"
 }</code></pre>
-
-<h3>Response example (list)</h3>
-<pre><code>[
-  { "id": 1, "title": "...", ... },
-  { "id": 2, "title": "...", ... }
-]</code></pre>
 
 <hr>
 
@@ -201,18 +199,54 @@ grant_type=client_credentials
 <pre><code>{
   "id": 1,
   "task_id": 1,
-  "author_name": "Max Mustermann",
+  "author_name": "pirat42",
   "text": "Flyer sind bestellt.",
   "created_at": "2025-05-04T12:30:00.000Z",
   "updated_at": "2025-05-04T12:30:00.000Z",
   "url": "https://meine-piraten.de/tasks/1/comments/1.json"
 }</code></pre>
 
-<h3>Response example (list)</h3>
+<hr>
+
+<h2 id="messages">Messages</h2>
+<p>Private messages between users. All endpoints require JWT authentication.</p>
+
+<h3>Endpoints</h3>
+<table>
+  <thead>
+    <tr><th>Method</th><th>Path</th><th>Description</th><th>Permission</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>GET</td><td><code>/api/messages</code></td><td>List received messages (inbox)</td><td>Any authenticated user</td></tr>
+    <tr><td>POST</td><td><code>/api/messages</code></td><td>Send a message</td><td>Any authenticated user</td></tr>
+    <tr><td>PATCH</td><td><code>/api/messages/:id</code></td><td>Mark a message as read</td><td>Any authenticated user (own messages only)</td></tr>
+  </tbody>
+</table>
+
+<h3>GET /api/messages</h3>
+<p>Returns the 50 most recent messages received by the authenticated user, ordered by newest first.</p>
 <pre><code>[
-  { "id": 1, "task_id": 1, "author_name": "...", "text": "...", ... },
-  { "id": 2, "task_id": 1, "author_name": "...", "text": "...", ... }
+  {
+    "id": 1,
+    "sender_id": 42,
+    "body": "Kannst du die Flyer bis Freitag fertig haben?",
+    "read": false,
+    "created_at": "2026-03-19T10:30:00Z"
+  }
 ]</code></pre>
+
+<h3>POST /api/messages</h3>
+<p>Send a message to another user.</p>
+<pre><code>{
+  "recipient_id": 42,
+  "body": "Ja, kein Problem!"
+}</code></pre>
+<p><strong>Success response (201 Created):</strong></p>
+<pre><code>{ "id": 2 }</code></pre>
+<p><strong>Error (422):</strong> returned if body is blank or recipient is invalid.</p>
+
+<h3>PATCH /api/messages/:id</h3>
+<p>Marks a received message as read. Only the recipient can mark their own messages. Returns <code>200 OK</code> with <code>{}</code>. Returns <code>404</code> if the message does not belong to the authenticated user.</p>
 
 <hr>
 
@@ -242,6 +276,18 @@ grant_type=client_credentials
     "entity_id":    "integer (optional, parent entity foreign key)"
   }
 }</code></pre>
+
+<h4>Entity levels</h4>
+<table>
+  <thead>
+    <tr><th>Value</th><th>Meaning</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>LV</code></td><td>Landesverband</td></tr>
+    <tr><td><code>KV</code></td><td>Kreisverband</td></tr>
+    <tr><td><code>OV</code></td><td>Ortsverband</td></tr>
+  </tbody>
+</table>
 
 <h3>Response example (single entity)</h3>
 <pre><code>{
@@ -336,6 +382,51 @@ grant_type=client_credentials
 ]</code></pre>
 
 <p>Posts are ordered by <code>posted_at</code> descending (newest first) and limited to posts from the last 30 days.</p>
+
+<hr>
+
+<h2 id="push-subscriptions">Push Subscriptions</h2>
+<p>Register or deregister APNs device tokens for push notifications. All endpoints require JWT authentication.</p>
+
+<h3>Endpoints</h3>
+<table>
+  <thead>
+    <tr><th>Method</th><th>Path</th><th>Description</th><th>Permission</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>POST</td><td><code>/api/push_subscriptions</code></td><td>Register or update a device token</td><td>Any authenticated user</td></tr>
+    <tr><td>DELETE</td><td><code>/api/push_subscriptions/:token</code></td><td>Deregister a device token</td><td>Any authenticated user</td></tr>
+  </tbody>
+</table>
+
+<h3>POST /api/push_subscriptions</h3>
+<p>Register a device token or update notification preferences for an existing token (upsert).</p>
+<pre><code>{
+  "token":    "a1b2c3d4e5f6...",
+  "platform": "ios",
+  "messages": true,
+  "todos":    false,
+  "forum":    true,
+  "news":     false
+}</code></pre>
+<p><strong>Success response:</strong> <code>200 OK</code> with <code>{}</code></p>
+<p><strong>Error (422):</strong> returned if validation fails.</p>
+
+<h3>DELETE /api/push_subscriptions/:token</h3>
+<p>Remove a device token registration. Idempotent &mdash; returns <code>200 OK</code> with <code>{}</code> even if the token is unknown.</p>
+
+<h4>Notification categories</h4>
+<table>
+  <thead>
+    <tr><th>Category</th><th>Parameter</th><th>Trigger</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Messages</td><td><code>messages</code></td><td>New private message received</td></tr>
+    <tr><td>Todos</td><td><code>todos</code></td><td>Task assigned to you or task status changed</td></tr>
+    <tr><td>Forum</td><td><code>forum</code></td><td>New forum post (if available)</td></tr>
+    <tr><td>News</td><td><code>news</code></td><td>New Telegram news item published</td></tr>
+  </tbody>
+</table>
 
 <hr>
 
