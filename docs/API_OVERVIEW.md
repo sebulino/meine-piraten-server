@@ -247,7 +247,7 @@ An entity represents an organizational unit (e.g. Landesverband, Bezirksverband,
   "entity": {
     "name": "string",
     "entity_level": "string (one of: LV, BZV, KV)",
-    "entity_id": "integer (optional, self-referencing parent entity)"
+    "parent_entity_id": "integer (optional, parent entity foreign key)"
   }
 }
 ```
@@ -261,7 +261,7 @@ An entity represents an organizational unit (e.g. Landesverband, Bezirksverband,
   "id": 1,
   "name": "KV Frankfurt",
   "entity_level": "KV",
-  "entity_id": 2,
+  "parent_entity_id": 2,
   "created_at": "2025-04-04T14:07:33.000Z",
   "updated_at": "2025-04-04T14:07:33.000Z",
   "parent_entity_name": "LV Hessen",
@@ -404,7 +404,7 @@ Comments are nested under tasks. Each comment belongs to a task.
 | id | integer | primary key, auto-increment |
 | name | string | |
 | entity_level | string | one of: LV (Landesverband), BZV (Bezirksverband), KV (Kreisverband) |
-| entity_id | integer | self-referencing parent entity |
+| parent_entity_id | integer | foreign key to parent entity |
 | created_at | datetime | not null |
 | updated_at | datetime | not null |
 
@@ -447,7 +447,7 @@ The `badge` count reflects the recipient's unread message count.
 
 ## Notes
 
-- The `entity_id` field on the entities table is a self-referencing foreign key for hierarchical organization (e.g. a Kreisverband belongs to a Landesverband).
+- The `parent_entity_id` field on the entities table is a self-referencing foreign key for hierarchical organization (e.g. a Kreisverband belongs to a Landesverband).
 - The `entity_level` field on entities indicates the organizational level (LV, BZV, KV).
 - All JSON responses from `/tasks`, `/entities`, `/categories`, `/comments` include a `url` field with the resource's canonical URL.
 - The root path (`/`) maps to `tasks#index`.

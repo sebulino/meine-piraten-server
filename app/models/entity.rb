@@ -1,6 +1,6 @@
 class Entity < ApplicationRecord
-  belongs_to :parent_entity, class_name: "Entity", optional: true, foreign_key: :entity_id
-  has_many :sub_entities, class_name: "Entity", foreign_key: :entity_id, dependent: :nullify
+  belongs_to :parent_entity, class_name: "Entity", optional: true
+  has_many :sub_entities, class_name: "Entity", foreign_key: :parent_entity_id, dependent: :nullify
 
   has_many :tasks
 
@@ -23,20 +23,20 @@ class Entity < ApplicationRecord
   private
 
   def parent_is_not_self
-    errors.add(:entity_id, "kann nicht auf sich selbst verweisen") if entity_id.present? && entity_id == id
+    errors.add(:parent_entity_id, "kann nicht auf sich selbst verweisen") if parent_entity_id.present? && parent_entity_id == id
   end
 
   def parent_is_not_descendant
-    return if entity_id.blank?
-    ancestor = Entity.find_by(id: entity_id)
+    return if parent_entity_id.blank?
+    ancestor = Entity.find_by(id: parent_entity_id)
     visited = Set.new([ id ])
     while ancestor
       if visited.include?(ancestor.id)
-        errors.add(:entity_id, "würde einen Zirkelbezug erzeugen")
+        errors.add(:parent_entity_id, "würde einen Zirkelbezug erzeugen")
         break
       end
       visited << ancestor.id
-      ancestor = Entity.find_by(id: ancestor.entity_id)
+      ancestor = Entity.find_by(id: ancestor.parent_entity_id)
     end
   end
 end

@@ -1,24 +1,24 @@
 lv_hessen:
   name: LV Hessen
   entity_level: LV
-  entity_id:
+  parent_entity_id:
 
 kv_frankfurt:
   name: KV Frankfurt
   entity_level: KV
-  entity_id: <%= ActiveRecord::FixtureSet.identify(:lv_hessen) %>
+  parent_entity_id: <%= ActiveRecord::FixtureSet.identify(:lv_hessen) %>
 
 lv_bayern:
   name: LV Bayern
   entity_level: LV
-  entity_id:
+  parent_entity_id:
 
 kv_muenchen:
   name: KV Muenchen
   entity_level: KV
-  entity_id: <%= ActiveRecord::FixtureSet.identify(:lv_bayern) %>
+  parent_entity_id: <%= ActiveRecord::FixtureSet.identify(:lv_bayern) %>
 
 bzv_oberbayern:
   name: BZV Oberbayern
   entity_level: BZV
-  entity_id: <%= ActiveRecord::FixtureSet.identify(:lv_bayern) %>
+  parent_entity_id: <%= ActiveRecord::FixtureSet.identify(:lv_bayern) %>
