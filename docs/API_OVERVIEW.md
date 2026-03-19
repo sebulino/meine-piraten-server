@@ -264,6 +264,7 @@ An entity represents an organizational unit (e.g. Landesverband, Bezirksverband,
   "entity_id": 2,
   "created_at": "2025-04-04T14:07:33.000Z",
   "updated_at": "2025-04-04T14:07:33.000Z",
+  "parent_entity_name": "LV Hessen",
   "url": "https://meine-piraten.de/entities/1.json"
 }
 ```

@@ -21,7 +21,7 @@
       <tr>
         <td><%= link_to entity.name, entity %></td>
         <td><%= entity.entity_level_label %></td>
-        <td><%= Entity.find_by(id: entity.entity_id)&.name %></td>
+        <td><%= entity.parent_entity&.name %></td>
       </tr>
     <% end %>
   </tbody>
