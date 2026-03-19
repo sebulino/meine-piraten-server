@@ -16,7 +16,7 @@ Task management and team coordination platform for the Piratenpartei (Pirate Par
 
 ### Categories & Entities
 - **Categories** organize tasks by topic (e.g. Wahlkampf, IT, Kommunikation)
-- **Entities** represent the party's organizational hierarchy (Landesverband, Kreisverband, Ortsverband) with parent/child relationships
+- **Entities** represent the party's organizational hierarchy (Landesverband, Bezirksverband, Kreisverband) with parent/child relationships
 - Admin-only CRUD for both
 
 ### Authentication

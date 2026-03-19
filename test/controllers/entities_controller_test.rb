@@ -77,7 +77,7 @@ class EntitiesControllerTest < ActionDispatch::IntegrationTest
 
   test "admin should destroy entity" do
     sign_in users(:admin_pirat)
-    entity_without_tasks = entities(:ov_schwabing)
+    entity_without_tasks = entities(:bzv_oberbayern)
     assert_difference("Entity.count", -1) do
       delete entity_url(entity_without_tasks)
     end
@@ -87,7 +87,7 @@ class EntitiesControllerTest < ActionDispatch::IntegrationTest
 
   test "regular user should not destroy entity" do
     sign_in users(:pirat)
-    entity_without_tasks = entities(:ov_schwabing)
+    entity_without_tasks = entities(:bzv_oberbayern)
     assert_no_difference("Entity.count") do
       delete entity_url(entity_without_tasks)
     end
