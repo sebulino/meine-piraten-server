@@ -2,42 +2,34 @@ require "application_system_test_case"
 
 class EntitiesTest < ApplicationSystemTestCase
   setup do
-    @entity = entities(:one)
+    @entity = entities(:lv_hessen)
   end
 
   test "visiting the index" do
     visit entities_url
-    assert_selector "h1", text: "Entities"
+    assert_selector "h1", text: "Gliederungen"
   end
 
   test "should create entity" do
     visit entities_url
-    click_on "New entity"
+    click_on "Neue Gliederung"
 
-    check "Kv" if @entity.KV
-    check "Lv" if @entity.LV
-    check "Ov" if @entity.OV
-    fill_in "Entity", with: @entity.entity_id
-    fill_in "Name", with: @entity.name
+    fill_in "Name", with: "LV Test"
+    select "Landesverband", from: "Gliederungsebene"
     click_on "Create Entity"
 
     assert_text "Entity was successfully created"
-    click_on "Back"
   end
 
   test "should update Entity" do
     visit entity_url(@entity)
     click_on "Edit this entity", match: :first
 
-    check "Kv" if @entity.KV
-    check "Lv" if @entity.LV
-    check "Ov" if @entity.OV
-    fill_in "Entity", with: @entity.entity_id
     fill_in "Name", with: @entity.name
+    select "Landesverband", from: "Gliederungsebene"
     click_on "Update Entity"
 
     assert_text "Entity was successfully updated"
-    click_on "Back"
   end
 
   test "should destroy Entity" do

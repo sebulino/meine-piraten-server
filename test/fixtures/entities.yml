@@ -1,34 +1,24 @@
 lv_hessen:
   name: LV Hessen
-  LV: true
-  OV: false
-  KV: false
+  entity_level: LV
   entity_id:
 
 kv_frankfurt:
   name: KV Frankfurt
-  LV: false
-  OV: false
-  KV: true
+  entity_level: KV
   entity_id:
 
 lv_bayern:
   name: LV Bayern
-  LV: true
-  OV: false
-  KV: false
+  entity_level: LV
   entity_id:
 
 kv_muenchen:
   name: KV Muenchen
-  LV: false
-  OV: false
-  KV: true
+  entity_level: KV
   entity_id:
 
 ov_schwabing:
   name: OV Schwabing
-  LV: false
-  OV: true
-  KV: false
+  entity_level: OV
   entity_id:

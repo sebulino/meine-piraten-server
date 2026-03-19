@@ -16,24 +16,8 @@
   </div>
 
   <div class="form-group">
-    <div class="checkbox-row">
-      <%= form.checkbox :LV %>
-      <%= form.label :LV, "Landesverband (LV)" %>
-    </div>
-  </div>
-
-  <div class="form-group">
-    <div class="checkbox-row">
-      <%= form.checkbox :OV %>
-      <%= form.label :OV, "Ortsverband (OV)" %>
-    </div>
-  </div>
-
-  <div class="form-group">
-    <div class="checkbox-row">
-      <%= form.checkbox :KV %>
-      <%= form.label :KV, "Kreisverband (KV)" %>
-    </div>
+    <%= form.label :entity_level, "Gliederungsebene" %>
+    <%= form.select :entity_level, Entity::ENTITY_LEVEL_LABELS.map { |k, v| [v, k] }, { prompt: "Bitte wählen" } %>
   </div>
 
   <div class="form-group">
