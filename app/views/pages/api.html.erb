@@ -273,7 +273,7 @@ grant_type=client_credentials
   "entity": {
     "name":         "string (required)",
     "entity_level": "string (one of: LV, BZV, KV)",
-    "entity_id":    "integer (optional, parent entity foreign key)"
+    "parent_entity_id": "integer (optional, parent entity foreign key)"
   }
 }</code></pre>
 
@@ -294,7 +294,7 @@ grant_type=client_credentials
   "id": 1,
   "name": "Piratenpartei Bayern",
   "entity_level": "LV",
-  "entity_id": null,
+  "parent_entity_id": null,
   "created_at": "2025-01-01T00:00:00.000Z",
   "updated_at": "2025-01-01T00:00:00.000Z",
   "parent_entity_name": null,

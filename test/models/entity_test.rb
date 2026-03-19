@@ -19,30 +19,30 @@ class EntityTest < ActiveSupport::TestCase
 
   test "cannot reference self as parent" do
     entity = entities(:lv_hessen)
-    entity.entity_id = entity.id
+    entity.parent_entity_id = entity.id
     assert_not entity.valid?
-    assert_includes entity.errors[:entity_id], "kann nicht auf sich selbst verweisen"
+    assert_includes entity.errors[:parent_entity_id], "kann nicht auf sich selbst verweisen"
   end
 
   test "cannot create circular reference" do
     lv = entities(:lv_bayern)
     kv = entities(:kv_muenchen)
     # Make LV Bayern point to KV Muenchen (which already points to LV Bayern)
-    lv.entity_id = kv.id
+    lv.parent_entity_id = kv.id
     assert_not lv.valid?
-    assert_includes lv.errors[:entity_id], "würde einen Zirkelbezug erzeugen"
+    assert_includes lv.errors[:parent_entity_id], "würde einen Zirkelbezug erzeugen"
   end
 
   test "valid parent reference is accepted" do
-    entity = Entity.new(name: "KV Test", entity_level: "KV", entity_id: entities(:lv_hessen).id)
+    entity = Entity.new(name: "KV Test", entity_level: "KV", parent_entity_id: entities(:lv_hessen).id)
     assert entity.valid?
   end
 
   test "deleting parent nullifies children" do
     parent = Entity.create!(name: "Parent Test", entity_level: "LV")
-    child = Entity.create!(name: "Child Test", entity_level: "KV", entity_id: parent.id)
+    child = Entity.create!(name: "Child Test", entity_level: "KV", parent_entity_id: parent.id)
     parent.destroy!
     child.reload
-    assert_nil child.entity_id
+    assert_nil child.parent_entity_id
   end
 end
