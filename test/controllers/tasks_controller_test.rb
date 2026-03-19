@@ -10,7 +10,7 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
   EXPECTED_TASK_FIELDS = %w[
     id title description completed creator_name time_needed_in_hours
     due_date urgent activity_points category_id entity_id status
-    assignee created_at updated_at url
+    assignee_id assignee_name created_at updated_at url
   ].freeze
 
   # -- Index --
@@ -106,7 +106,7 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
 
   test "PATCH /tasks/:id.json regular user can claim task (open to claimed)" do
     patch task_url(@task, format: :json), params: {
-      task: { status: "claimed", assignee: "pirat42" }
+      task: { status: "claimed", assignee_id: users(:pirat).id }
     }, headers: regular_auth_headers
 
     assert_response :success

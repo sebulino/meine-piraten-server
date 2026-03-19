@@ -29,7 +29,7 @@
     <% if task.assignee.present? %>
       <div class="detail-item">
         <div class="detail-label">Zugewiesen an</div>
-        <div class="detail-value"><%= task.assignee %></div>
+        <div class="detail-value"><%= task.assignee.name %></div>
       </div>
     <% end %>
 

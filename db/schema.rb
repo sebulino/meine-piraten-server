@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_24_203129) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_19_100001) do
   create_table "admin_requests", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "reason"
@@ -62,9 +62,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_24_203129) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "messages", force: :cascade do |t|
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.boolean "read", default: false, null: false
+    t.integer "recipient_id", null: false
+    t.integer "sender_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["recipient_id", "read"], name: "index_messages_on_recipient_id_and_read"
+    t.index ["recipient_id"], name: "index_messages_on_recipient_id"
+    t.index ["sender_id"], name: "index_messages_on_sender_id"
+  end
+
+  create_table "push_subscriptions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.boolean "forum_enabled", default: false, null: false
+    t.boolean "messages_enabled", default: false, null: false
+    t.boolean "news_enabled", default: false, null: false
+    t.string "platform", default: "ios", null: false
+    t.boolean "todos_enabled", default: false, null: false
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["token"], name: "index_push_subscriptions_on_token", unique: true
+    t.index ["user_id"], name: "index_push_subscriptions_on_user_id"
+  end
+
   create_table "tasks", force: :cascade do |t|
     t.integer "activity_points"
-    t.string "assignee"
+    t.integer "assignee_id"
     t.integer "category_id", null: false
     t.boolean "completed"
     t.datetime "created_at", null: false
@@ -77,6 +103,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_24_203129) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.boolean "urgent"
+    t.index ["assignee_id"], name: "index_tasks_on_assignee_id"
     t.index ["category_id"], name: "index_tasks_on_category_id"
     t.index ["entity_id"], name: "index_tasks_on_entity_id"
   end
@@ -113,6 +140,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_24_203129) do
   add_foreign_key "admin_requests", "users"
   add_foreign_key "admin_requests", "users", column: "reviewed_by_id"
   add_foreign_key "comments", "tasks"
+  add_foreign_key "messages", "users", column: "recipient_id"
+  add_foreign_key "messages", "users", column: "sender_id"
+  add_foreign_key "push_subscriptions", "users"
   add_foreign_key "tasks", "categories"
   add_foreign_key "tasks", "entities"
+  add_foreign_key "tasks", "users", column: "assignee_id"
 end
