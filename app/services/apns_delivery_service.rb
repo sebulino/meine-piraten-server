@@ -1,53 +1,58 @@
-require "net/http"
-require "json"
-require "openssl"
-require "jwt"
+require "apnotic"
 
 class ApnsDeliveryService
-  APNS_PRODUCTION_URL = "https://api.push.apple.com"
-  APNS_SANDBOX_URL    = "https://api.sandbox.push.apple.com"
-  TOKEN_TTL = 50.minutes
-
-  class DeliveryError < StandardError; end
-  INVALID_TOKEN_REASONS = %w[BadDeviceToken Unregistered ExpiredProviderToken].freeze
+  INVALID_TOKEN_STATUSES = %w[400 403 404 410].freeze
+  INVALID_TOKEN_REASONS  = %w[BadDeviceToken Unregistered ExpiredProviderToken].freeze
 
   class << self
-    def send_notification(token:, payload:)
-      new.send_notification(token: token, payload: payload)
+    def send_notification(token:, payload:, badge: nil)
+      instance.send_notification(token: token, payload: payload, badge: badge)
+    end
+
+    def instance
+      @instance ||= new
+    end
+
+    def reset_connection!
+      @instance&.close
+      @instance = nil
     end
   end
 
   def initialize
-    @key_id    = ENV.fetch("APNS_KEY_ID")
-    @team_id   = ENV.fetch("APNS_TEAM_ID")
-    @bundle_id = ENV.fetch("APNS_BUNDLE_ID")
-    @key_path  = ENV.fetch("APNS_KEY_PATH")
+    @key_path    = ENV.fetch("APNS_KEY_PATH")
+    @key_id      = ENV.fetch("APNS_KEY_ID")
+    @team_id     = ENV.fetch("APNS_TEAM_ID")
+    @bundle_id   = ENV.fetch("APNS_BUNDLE_ID")
     @environment = ENV.fetch("APNS_ENVIRONMENT", "production")
+    @mutex       = Mutex.new
   end
 
-  def send_notification(token:, payload:)
-    uri = URI("#{base_url}/3/device/#{token}")
+  def send_notification(token:, payload:, badge: nil)
+    notification       = Apnotic::Notification.new(token)
+    notification.topic = @bundle_id
 
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
+    aps = payload[:aps] || {}
+    notification.alert = aps[:alert] if aps[:alert]
+    notification.sound = aps[:sound] if aps[:sound]
+    notification.badge = badge unless badge.nil?
 
-    request = Net::HTTP::Post.new(uri.path)
-    request["authorization"] = "bearer #{provider_token}"
-    request["apns-topic"] = @bundle_id
-    request["apns-push-type"] = "alert"
-    request["apns-priority"] = "10"
-    request.body = payload.to_json
+    custom = payload.except(:aps)
+    notification.custom_payload = custom if custom.any?
 
-    response = http.request(request)
+    response = connection.push(notification)
 
-    case response.code.to_i
-    when 200
+    if response.nil?
+      Rails.logger.error "APNs: timeout for #{token[0..7]}..."
+      return { success: false, reason: "timeout" }
+    end
+
+    if response.ok?
       Rails.logger.info "APNs: delivered to #{token[0..7]}..."
       { success: true }
-    when 400, 403, 404, 410
-      body = JSON.parse(response.body) rescue {}
-      reason = body["reason"]
-      Rails.logger.warn "APNs: rejected token #{token[0..7]}... (#{reason})"
+    else
+      reason = response.body&.dig("reason")
+      Rails.logger.warn "APNs: rejected #{token[0..7]}... (#{response.status}: #{reason})"
 
       if INVALID_TOKEN_REASONS.include?(reason)
         PushSubscription.where(token: token).destroy_all
@@ -55,32 +60,38 @@ class ApnsDeliveryService
       end
 
       { success: false, reason: reason }
-    else
-      Rails.logger.error "APNs: unexpected response #{response.code} for #{token[0..7]}..."
-      { success: false, reason: "http_#{response.code}" }
     end
-  rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, Errno::ECONNREFUSED => e
-    Rails.logger.error "APNs: network error (#{e.class}): #{e.message}"
-    { success: false, reason: "network_error" }
+  rescue StandardError => e
+    Rails.logger.error "APNs: error (#{e.class}): #{e.message}"
+    { success: false, reason: "error" }
+  end
+
+  def close
+    @mutex.synchronize do
+      @connection&.close
+      @connection = nil
+    end
   end
 
   private
 
-  def base_url
-    @environment == "production" ? APNS_PRODUCTION_URL : APNS_SANDBOX_URL
+  def connection
+    @mutex.synchronize do
+      @connection ||= build_connection
+    end
   end
 
-  def provider_token
-    now = Time.now.to_i
-    if @cached_token && @token_issued_at && (now - @token_issued_at) < TOKEN_TTL.to_i
-      return @cached_token
+  def build_connection
+    method = @environment == "production" ? :new : :development
+    conn = Apnotic::Connection.public_send(method,
+      auth_method: :token,
+      cert_path: @key_path,
+      key_id: @key_id,
+      team_id: @team_id
+    )
+    conn.on(:error) do |e|
+      Rails.logger.error "APNs connection error: #{e}"
     end
-
-    key = OpenSSL::PKey::EC.new(File.read(@key_path))
-    header = { kid: @key_id }
-    claims = { iss: @team_id, iat: now }
-
-    @token_issued_at = now
-    @cached_token = JWT.encode(claims, key, "ES256", header)
+    conn
   end
 end

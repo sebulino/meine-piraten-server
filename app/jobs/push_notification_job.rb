@@ -32,10 +32,17 @@ class PushNotificationJob < ApplicationJob
 
     delivered = 0
     scope.find_each do |sub|
-      result = ApnsDeliveryService.send_notification(token: sub.token, payload: payload)
+      badge = unread_badge_count(sub.user_id)
+      result = ApnsDeliveryService.send_notification(token: sub.token, payload: payload, badge: badge)
       delivered += 1 if result[:success]
     end
 
     Rails.logger.info "PushNotificationJob: #{category} — delivered #{delivered}/#{scope.count}"
+  end
+
+  private
+
+  def unread_badge_count(user_id)
+    Message.where(recipient_id: user_id, read: false).count
   end
 end
