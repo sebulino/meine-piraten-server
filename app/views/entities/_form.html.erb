@@ -21,8 +21,8 @@
   </div>
 
   <div class="form-group">
-    <%= form.label :entity_id, "Übergeordnete Gliederung" %>
-    <%= form.collection_select(:entity_id, Entity.where.not(id: entity.id), :id, :name, prompt: "Keine (oberste Ebene)", include_blank: false) %>
+    <%= form.label :parent_entity_id, "Übergeordnete Gliederung" %>
+    <%= form.collection_select(:parent_entity_id, Entity.where.not(id: entity.id), :id, :name, { include_blank: "Keine (oberste Ebene)" }) %>
   </div>
 
   <div class="btn-group">

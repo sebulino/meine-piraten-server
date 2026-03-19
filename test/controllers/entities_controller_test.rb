@@ -36,7 +36,7 @@ class EntitiesControllerTest < ActionDispatch::IntegrationTest
   test "admin should create entity" do
     sign_in users(:admin_pirat)
     assert_difference("Entity.count") do
-      post entities_url, params: { entity: { entity_level: @entity.entity_level, entity_id: @entity.entity_id, name: @entity.name } }
+      post entities_url, params: { entity: { entity_level: @entity.entity_level, parent_entity_id: @entity.parent_entity_id, name: @entity.name } }
     end
 
     assert_redirected_to entity_url(Entity.last)
@@ -45,7 +45,7 @@ class EntitiesControllerTest < ActionDispatch::IntegrationTest
   test "regular user should not create entity" do
     sign_in users(:pirat)
     assert_no_difference("Entity.count") do
-      post entities_url, params: { entity: { entity_level: @entity.entity_level, entity_id: @entity.entity_id, name: @entity.name } }
+      post entities_url, params: { entity: { entity_level: @entity.entity_level, parent_entity_id: @entity.parent_entity_id, name: @entity.name } }
     end
 
     assert_redirected_to root_path
@@ -65,7 +65,7 @@ class EntitiesControllerTest < ActionDispatch::IntegrationTest
 
   test "admin should update entity" do
     sign_in users(:admin_pirat)
-    patch entity_url(@entity), params: { entity: { entity_level: @entity.entity_level, entity_id: @entity.entity_id, name: @entity.name } }
+    patch entity_url(@entity), params: { entity: { entity_level: @entity.entity_level, parent_entity_id: @entity.parent_entity_id, name: @entity.name } }
     assert_redirected_to entity_url(@entity)
   end
 

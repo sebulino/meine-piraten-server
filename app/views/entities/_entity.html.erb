@@ -7,10 +7,10 @@
       <div class="detail-value"><%= entity.entity_level_label || "Keine" %></div>
     </div>
 
-    <% if entity.entity_id.present? %>
+    <% if entity.parent_entity_id.present? %>
       <div class="detail-item">
         <div class="detail-label">Übergeordnete Gliederung</div>
-        <div class="detail-value"><%= entity.parent_entity&.name || entity.entity_id %></div>
+        <div class="detail-value"><%= entity.parent_entity&.name || entity.parent_entity_id %></div>
       </div>
     <% end %>
   </div>
