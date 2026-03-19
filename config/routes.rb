@@ -16,6 +16,8 @@ Rails.application.routes.draw do
 
   namespace :api do
     resources :news, only: [ :index ]
+    resources :push_subscriptions, only: [ :create, :destroy ], param: :token
+    resources :messages, only: [ :index, :create, :update ]
   end
   resources :admin_requests, only: [:index, :create] do
     collection do

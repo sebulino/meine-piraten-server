@@ -1,0 +1,11 @@
+from_admin_to_pirat:
+  sender: admin_pirat
+  recipient: pirat
+  body: "Kannst du die Flyer bis Freitag fertig haben?"
+  read: false
+
+from_pirat_to_admin:
+  sender: pirat
+  recipient: admin_pirat
+  body: "Ja, kein Problem!"
+  read: true

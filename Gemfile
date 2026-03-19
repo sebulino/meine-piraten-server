@@ -20,6 +20,7 @@ gem "devise", "~> 5.0"
 gem "omniauth_openid_connect", "~> 0.8"
 gem "omniauth-rails_csrf_protection", "~> 2.0"
 gem "jwt", "~> 3.1"
+gem "apnotic"
 
 gem "image_processing", "~> 1.2"
 

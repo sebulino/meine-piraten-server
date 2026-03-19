@@ -1,0 +1,17 @@
+pirat_device:
+  token: "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6abcd"
+  platform: "ios"
+  user: pirat
+  messages_enabled: true
+  todos_enabled: false
+  forum_enabled: true
+  news_enabled: true
+
+admin_device:
+  token: "b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6efgh"
+  platform: "ios"
+  user: admin_pirat
+  messages_enabled: true
+  todos_enabled: true
+  forum_enabled: false
+  news_enabled: true
