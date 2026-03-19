@@ -18,7 +18,7 @@ kv_muenchen:
   entity_level: KV
   entity_id:
 
-ov_schwabing:
-  name: OV Schwabing
-  entity_level: OV
+bzv_oberbayern:
+  name: BZV Oberbayern
+  entity_level: BZV
   entity_id:

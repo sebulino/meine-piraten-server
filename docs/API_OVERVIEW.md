@@ -229,7 +229,7 @@ Returns up to 50 recent channel posts (configurable via `?limit=N`, max 200), or
 
 ### Entities
 
-An entity represents an organizational unit (e.g. Kreisverband, Landesverband, Ortsverband).
+An entity represents an organizational unit (e.g. Landesverband, Bezirksverband, Kreisverband).
 
 #### Endpoints
 
@@ -247,13 +247,13 @@ An entity represents an organizational unit (e.g. Kreisverband, Landesverband, O
 {
   "entity": {
     "name": "string",
-    "entity_level": "string (one of: LV, KV, OV)",
+    "entity_level": "string (one of: LV, BZV, KV)",
     "entity_id": "integer (optional, self-referencing parent entity)"
   }
 }
 ```
 
-`entity_level` values: `LV` (Landesverband), `KV` (Kreisverband), `OV` (Ortsverband).
+`entity_level` values: `LV` (Landesverband), `BZV` (Bezirksverband), `KV` (Kreisverband).
 
 #### Response Shape (single entity)
 
@@ -403,7 +403,7 @@ Comments are nested under tasks. Each comment belongs to a task.
 |--------|------|-------------|
 | id | integer | primary key, auto-increment |
 | name | string | |
-| entity_level | string | one of: LV (Landesverband), KV (Kreisverband), OV (Ortsverband) |
+| entity_level | string | one of: LV (Landesverband), BZV (Bezirksverband), KV (Kreisverband) |
 | entity_id | integer | self-referencing parent entity |
 | created_at | datetime | not null |
 | updated_at | datetime | not null |
@@ -448,6 +448,6 @@ The `badge` count reflects the recipient's unread message count.
 ## Notes
 
 - The `entity_id` field on the entities table is a self-referencing foreign key for hierarchical organization (e.g. a Kreisverband belongs to a Landesverband).
-- The `LV`, `OV`, `KV` boolean flags on entities indicate the organizational level type.
+- The `entity_level` field on entities indicates the organizational level (LV, BZV, KV).
 - All JSON responses from `/tasks`, `/entities`, `/categories`, `/comments` include a `url` field with the resource's canonical URL.
 - The root path (`/`) maps to `tasks#index`.

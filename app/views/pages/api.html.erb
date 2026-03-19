@@ -251,7 +251,7 @@ grant_type=client_credentials
 <hr>
 
 <h2 id="entities">Entities</h2>
-<p>Entities represent organizational units (Landes-, Kreis-, or Ortsverbände). Entities can be self-referentially nested (e.g. a KV belonging to an LV).</p>
+<p>Entities represent organizational units (Landes-, Bezirks-, or Kreisverbände). Entities can be self-referentially nested (e.g. a KV belonging to an LV).</p>
 
 <h3>Endpoints</h3>
 <table>
@@ -272,7 +272,7 @@ grant_type=client_credentials
 <pre><code>{
   "entity": {
     "name":         "string (required)",
-    "entity_level": "string (one of: LV, KV, OV)",
+    "entity_level": "string (one of: LV, BZV, KV)",
     "entity_id":    "integer (optional, parent entity foreign key)"
   }
 }</code></pre>
@@ -284,8 +284,8 @@ grant_type=client_credentials
   </thead>
   <tbody>
     <tr><td><code>LV</code></td><td>Landesverband</td></tr>
+    <tr><td><code>BZV</code></td><td>Bezirksverband</td></tr>
     <tr><td><code>KV</code></td><td>Kreisverband</td></tr>
-    <tr><td><code>OV</code></td><td>Ortsverband</td></tr>
   </tbody>
 </table>
 

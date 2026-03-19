@@ -37,8 +37,8 @@ kv_muenchen = Entity.find_or_create_by!(name: "KV Muenchen") do |e|
   e.entity_level = "KV"; e.entity_id = lv_bayern.id
 end
 
-ov_schwabing = Entity.find_or_create_by!(name: "OV Schwabing") do |e|
-  e.entity_level = "OV"; e.entity_id = kv_muenchen.id
+bzv_oberbayern = Entity.find_or_create_by!(name: "BZV Oberbayern") do |e|
+  e.entity_level = "BZV"; e.entity_id = lv_bayern.id
 end
 
 # --- Tasks ---
