@@ -4,7 +4,7 @@ class EntitiesController < ApplicationController
 
   # GET /entities or /entities.json
   def index
-    @entities = Entity.all
+    @entities = Entity.includes(:parent_entity).all
   end
 
   # GET /entities/1 or /entities/1.json

@@ -10,7 +10,7 @@
     <% if entity.entity_id.present? %>
       <div class="detail-item">
         <div class="detail-label">Übergeordnete Gliederung</div>
-        <div class="detail-value"><%= Entity.find_by(id: entity.entity_id)&.name || entity.entity_id %></div>
+        <div class="detail-value"><%= entity.parent_entity&.name || entity.entity_id %></div>
       </div>
     <% end %>
   </div>

@@ -6,7 +6,7 @@ lv_hessen:
 kv_frankfurt:
   name: KV Frankfurt
   entity_level: KV
-  entity_id:
+  entity_id: <%= ActiveRecord::FixtureSet.identify(:lv_hessen) %>
 
 lv_bayern:
   name: LV Bayern
@@ -16,9 +16,9 @@ lv_bayern:
 kv_muenchen:
   name: KV Muenchen
   entity_level: KV
-  entity_id:
+  entity_id: <%= ActiveRecord::FixtureSet.identify(:lv_bayern) %>
 
 bzv_oberbayern:
   name: BZV Oberbayern
   entity_level: BZV
-  entity_id:
+  entity_id: <%= ActiveRecord::FixtureSet.identify(:lv_bayern) %>
