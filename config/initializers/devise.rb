@@ -281,7 +281,7 @@ Devise.setup do |config|
   client_id = ENV.fetch("KEYCLOAK_CLIENT_ID", "meine_piraten_de")
 
   client_secret =
-    if ENV["ASSETS_PRECOMPILE"] == "1"
+    if ENV["ASSETS_PRECOMPILE"] == "1" || Rails.env.test?
       ENV["KEYCLOAK_CLIENT_SECRET"] || "dummy"
     else
       ENV.fetch("KEYCLOAK_CLIENT_SECRET")
