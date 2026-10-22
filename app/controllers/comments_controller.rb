@@ -1,6 +1,6 @@
 class CommentsController < ApplicationController
   before_action :set_task
-  before_action :require_admin!, only: [:destroy]
+  before_action :require_admin!, only: [ :destroy ]
 
   # GET /tasks/:task_id/comments.json
   def index

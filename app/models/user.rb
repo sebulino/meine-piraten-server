@@ -1,6 +1,6 @@
 class User < ApplicationRecord
   devise :omniauthable, :trackable,
-         omniauth_providers: [:openid_connect]
+         omniauth_providers: [ :openid_connect ]
 
   has_many :admin_requests
   has_many :push_subscriptions, dependent: :destroy
