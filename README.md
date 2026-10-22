@@ -116,12 +116,29 @@ bin/rails server
 ```
 
 In development, you are automatically signed in as a superadmin user.
+`db:setup` loads sample users, tasks and messages from `db/seeds/development.rb`.
+
+### Fresh Production Setup
+
+On an empty database the container's `db:prepare` loads `db/seeds/production.rb`:
+the task categories and the Bundesverband with all 16 Landesverbände. No users are seeded,
+because users are matched by their Keycloak ID on login, not by username.
+
+To get the first superadmin, log in once via PiratenSSO, then run:
+
+```sh
+docker compose exec prod bin/rails "users:make_superadmin[<username>]"
+```
 
 ### Running Tests
 
 ```sh
-bin/rails test
+bin/rails test          # unit and integration tests
+bin/rails test:system   # browser tests (headless Chrome)
 ```
+
+CI (`.github/workflows/ci.yml`) runs lint, security scans, both test suites
+and a Docker build/boot smoke test on every pull request.
 
 ### API Authentication
 
