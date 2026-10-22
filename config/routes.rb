@@ -3,7 +3,7 @@ Rails.application.routes.draw do
     omniauth_callbacks: "users/omniauth_callbacks"
   }
   devise_scope :user do
-    get  "sign_in",  to: "users/sessions#new",     as: :new_user_session
+    get "sign_in",  to: "users/sessions#new",     as: :new_user_session
     delete "sign_out", to: "users/sessions#destroy", as: :destroy_user_session
     get "users/auth/failure", to: "users/omniauth_callbacks#failure"
   end
@@ -19,7 +19,7 @@ Rails.application.routes.draw do
     resources :push_subscriptions, only: [ :create, :destroy ], param: :token
     resources :messages, only: [ :index, :create, :update ]
   end
-  resources :admin_requests, only: [:index, :create] do
+  resources :admin_requests, only: [ :index, :create ] do
     collection do
       get :status
     end

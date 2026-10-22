@@ -6,7 +6,7 @@ class KeycloakTokenVerifier
   class << self
     def verify(token)
       JWT.decode(token, nil, true, {
-        algorithms: ["RS256"],
+        algorithms: [ "RS256" ],
         iss: ISSUER,
         verify_iss: true,
         jwks: jwks_loader

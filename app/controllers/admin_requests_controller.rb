@@ -1,5 +1,5 @@
 class AdminRequestsController < ApplicationController
-  before_action :require_superadmin!, only: [:index, :approve, :reject, :demote]
+  before_action :require_superadmin!, only: [ :index, :approve, :reject, :demote ]
 
   def index
     @pending_requests = AdminRequest.pending.includes(:user).order(created_at: :desc)
@@ -14,7 +14,7 @@ class AdminRequestsController < ApplicationController
     @admin_request = current_user_or_api_user.admin_requests.new(reason: params[:reason])
 
     if @admin_request.save
-      render :create, formats: [:json], status: :created
+      render :create, formats: [ :json ], status: :created
     else
       render json: { errors: @admin_request.errors.full_messages }, status: :unprocessable_entity
     end

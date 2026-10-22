@@ -4,7 +4,7 @@ class KeycloakTokenVerifierTest < ActiveSupport::TestCase
   setup do
     @rsa_key = OpenSSL::PKey::RSA.generate(2048)
     @jwk = JWT::JWK.new(@rsa_key, kid: "test-key-id")
-    @jwks = JWT::JWK::Set.new([@jwk])
+    @jwks = JWT::JWK::Set.new([ @jwk ])
   end
 
   test "verify decodes valid token" do

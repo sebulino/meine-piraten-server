@@ -8,6 +8,6 @@ class CreateMessages < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :messages, [:recipient_id, :read]
+    add_index :messages, [ :recipient_id, :read ]
   end
 end

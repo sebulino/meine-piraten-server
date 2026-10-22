@@ -12,6 +12,6 @@ class CreateChannelPosts < ActiveRecord::Migration[8.1]
     add_index :channel_posts, :chat_id
     add_index :channel_posts, :message_id
     add_index :channel_posts, :posted_at
-    add_index :channel_posts, [:chat_id, :message_id], unique: true
+    add_index :channel_posts, [ :chat_id, :message_id ], unique: true
   end
 end
