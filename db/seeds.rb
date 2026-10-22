@@ -22,23 +22,23 @@ end
 
 # --- Entities (hierarchical) ---
 lv_hessen = Entity.find_or_create_by!(name: "LV Hessen") do |e|
-  e.entity_level = "LV"; e.entity_id = nil
+  e.entity_level = "LV"; e.parent_entity = nil
 end
 
 kv_frankfurt = Entity.find_or_create_by!(name: "KV Frankfurt") do |e|
-  e.entity_level = "KV"; e.entity_id = lv_hessen.id
+  e.entity_level = "KV"; e.parent_entity = lv_hessen
 end
 
 lv_bayern = Entity.find_or_create_by!(name: "LV Bayern") do |e|
-  e.entity_level = "LV"; e.entity_id = nil
+  e.entity_level = "LV"; e.parent_entity = nil
 end
 
 kv_muenchen = Entity.find_or_create_by!(name: "KV Muenchen") do |e|
-  e.entity_level = "KV"; e.entity_id = lv_bayern.id
+  e.entity_level = "KV"; e.parent_entity = lv_bayern
 end
 
 bzv_oberbayern = Entity.find_or_create_by!(name: "BZV Oberbayern") do |e|
-  e.entity_level = "BZV"; e.entity_id = lv_bayern.id
+  e.entity_level = "BZV"; e.parent_entity = lv_bayern
 end
 
 # --- Tasks ---
@@ -53,7 +53,7 @@ end
 t2 = Task.find_or_create_by!(title: "Protokoll der letzten Sitzung") do |t|
   t.description = "Protokoll der Kreisvorstandssitzung vom 25.01. ins Wiki eintragen."
   t.entity = kv_muenchen; t.category = categories["Verwaltung"]
-  t.status = "claimed"; t.assignee = pirat42; t.activity_points = 5
+  t.status = "claimed"; t.assignee = pirat42.preferred_username; t.activity_points = 5
   t.time_needed_in_hours = 1; t.creator_name = "pirat99"
   t.due_date = 1.day.ago.to_date
 end
@@ -68,13 +68,13 @@ end
 Task.find_or_create_by!(title: "Social Media Posts vorbereiten") do |t|
   t.description = "3-5 Posts fuer die kommende Woche zum Thema Netzpolitik."
   t.entity = kv_frankfurt; t.category = categories["Oeffentlichkeitsarbeit"]
-  t.status = "claimed"; t.assignee = pirat99; t.creator_name = "pirat42"
+  t.status = "claimed"; t.assignee = pirat99.preferred_username; t.creator_name = "pirat42"
 end
 
 Task.find_or_create_by!(title: "Newsletter-Entwurf pruefen") do |t|
   t.description = "Korrekturlesen des monatlichen Newsletters."
   t.entity = lv_bayern; t.category = categories["Oeffentlichkeitsarbeit"]
-  t.status = "done"; t.assignee = pirat42; t.urgent = true; t.activity_points = 5
+  t.status = "done"; t.assignee = pirat42.preferred_username; t.urgent = true; t.activity_points = 5
   t.time_needed_in_hours = 1; t.creator_name = "pirat99"; t.completed = true
   t.due_date = 2.days.ago.to_date
 end
@@ -82,7 +82,7 @@ end
 Task.find_or_create_by!(title: "Raumreservierung Stammtisch") do |t|
   t.description = "Raum fuer den monatlichen Stammtisch im Februar reservieren."
   t.entity = kv_muenchen; t.category = categories["Veranstaltung"]
-  t.status = "done"; t.assignee = pirat99; t.activity_points = 3
+  t.status = "done"; t.assignee = pirat99.preferred_username; t.activity_points = 3
   t.creator_name = "pirat42"; t.completed = true
   t.due_date = 5.days.ago.to_date
 end
