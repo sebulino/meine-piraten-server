@@ -7,7 +7,10 @@ class AdminRequestsController < ApplicationController
   end
 
   def status
-    render json: { admin: admin? }
+    render json: {
+      admin: admin?,
+      pending_request: AdminRequest.pending.exists?(user: current_user_or_api_user)
+    }
   end
 
   def create

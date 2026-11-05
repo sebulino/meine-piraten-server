@@ -10,6 +10,8 @@
     <li><a href="#categories">Categories</a></li>
     <li><a href="#news">News</a></li>
     <li><a href="#admin-requests">Admin Requests</a></li>
+    <li><a href="#messages">Messages</a></li>
+    <li><a href="#push-subscriptions">Push Subscriptions</a></li>
   </ul>
 </nav>
 
@@ -56,7 +58,8 @@
 <p>All API endpoints require authentication via a <strong>Bearer token</strong> (JWT) issued by PiratenSSO (Keycloak), unless marked as public.</p>
 
 <h3>Obtaining a token</h3>
-<p>Request an access token from the PiratenSSO token endpoint using the OAuth 2.0 client credentials flow:</p>
+<p><strong>Apps acting on behalf of a member</strong> (e.g. the iOS app) sign the user in with the OAuth 2.0 Authorization Code flow with PKCE against the PiratenSSO realm <code>Piratenlogin</code> and send the user's access token. The server identifies the user by the token's <code>sub</code> claim and creates the user record on first request.</p>
+<p><strong>Server-to-server clients</strong> can use the client credentials flow. The resulting token belongs to the client's service account, not to a member:</p>
 <pre><code>POST https://sso.piratenpartei.de/realms/Piratenlogin/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
@@ -130,10 +133,14 @@ grant_type=client_credentials
 }</code></pre>
 
 <h4>Field update restrictions for non-admin users</h4>
-<p>Non-admin users may only update <code>status</code> and <code>assignee</code>. All other fields require admin privileges.</p>
+<p>Non-admin users may only update <code>status</code> and <code>assignee</code>. Any other fields they send are <strong>silently ignored</strong>: the request still returns <code>200 OK</code> with the unchanged values. Check the response body instead of assuming the change was applied.</p>
 
 <h3>Status transitions</h3>
-<p>Task status follows a strict state machine. Invalid transitions return <strong>422 Unprocessable Entity</strong>.</p>
+<p>Task status follows a strict state machine.</p>
+<ul>
+  <li>A transition the state machine does not allow (e.g. <code>open → done</code>) returns <strong>422 Unprocessable Entity</strong>.</li>
+  <li>A non-admin attempting an admin-only transition (e.g. <code>completed → done</code>) returns <strong>403 Forbidden</strong> with <code>{"error": "Forbidden"}</code>.</li>
+</ul>
 <table>
   <thead>
     <tr><th>From</th><th>Allowed transitions</th><th>Who can transition</th></tr>
@@ -226,8 +233,8 @@ grant_type=client_credentials
 <p>Wrap parameters in an <code>entity</code> key:</p>
 <pre><code>{
   "entity": {
-    "name":         "string (required)",
-    "entity_level": "string (one of: LV, BZV, KV)",
+    "name":         "string (not validated server-side; send a non-empty name)",
+    "entity_level": "string (optional, one of: LV, BZV, KV)",
     "parent_entity_id": "integer (optional, parent entity foreign key)"
   }
 }</code></pre>
@@ -279,7 +286,7 @@ grant_type=client_credentials
 <p>Wrap parameters in a <code>category</code> key:</p>
 <pre><code>{
   "category": {
-    "name": "string (required)"
+    "name": "string (not validated server-side; send a non-empty name)"
   }
 }</code></pre>
 
@@ -362,7 +369,8 @@ grant_type=client_credentials
 <pre><code>GET /admin_requests/status.json
 Authorization: Bearer eyJhbG...</code></pre>
 <p>Returns:</p>
-<pre><code>{ "admin": true }</code></pre>
+<pre><code>{ "admin": false, "pending_request": true }</code></pre>
+<p><code>pending_request</code> is <code>true</code> while you have a request awaiting review. Hide the request form in that case.</p>
 
 <h3>Submit a request</h3>
 <p>Send the <code>reason</code> as a top-level parameter:</p>
@@ -386,6 +394,7 @@ Content-Type: application/json
 <pre><code>{
   "errors": ["Reason can't be blank"]
 }</code></pre>
+<p>Only one pending request per user is allowed. A second submission returns 422 with <code>"Es liegt bereits eine offene Anfrage vor."</code> A new request is possible once the previous one was approved or rejected.</p>
 
 <h3>Approve / Reject / Demote (superadmin only)</h3>
 <pre><code>PATCH /admin_requests/1/approve.json
@@ -404,3 +413,85 @@ Authorization: Bearer eyJhbG...</code></pre>
 <pre><code>{ "status": "rejected" }</code></pre>
 
 <p>Non-superadmin users receive <strong>403 Forbidden</strong> for approve / reject / demote endpoints.</p>
+
+<hr>
+
+<h2 id="messages">Messages</h2>
+<p>Private messages between users of this server. Request bodies are top-level JSON (no wrapper key). Send <code>Accept: application/json</code> or append <code>.json</code>.</p>
+
+<h3>Endpoints</h3>
+<table>
+  <thead>
+    <tr><th>Method</th><th>Path</th><th>Description</th><th>Permission</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>GET</td><td><code>/api/messages.json</code></td><td>Your 50 most recent received messages, newest first</td><td>Any authenticated user</td></tr>
+    <tr><td>POST</td><td><code>/api/messages.json</code></td><td>Send a message</td><td>Any authenticated user</td></tr>
+    <tr><td>PATCH/PUT</td><td><code>/api/messages/:id.json</code></td><td>Mark a received message as read</td><td>Recipient only</td></tr>
+  </tbody>
+</table>
+
+<h3>Response example (list)</h3>
+<pre><code>[
+  {
+    "id": 1,
+    "sender_id": 42,
+    "body": "Kannst du die Flyer bis Freitag fertig haben?",
+    "read": false,
+    "created_at": "2026-03-19T10:30:00Z"
+  }
+]</code></pre>
+
+<h3>Send a message</h3>
+<pre><code>POST /api/messages.json
+Content-Type: application/json
+
+{ "recipient_id": 42, "body": "Ja, kein Problem!" }</code></pre>
+<p>Returns <code>201 Created</code> with <code>{ "id": 2 }</code>. A blank <code>body</code> or unknown <code>recipient_id</code> returns <code>422</code> with <code>{ "errors": [...] }</code>.</p>
+
+<h3>Mark as read</h3>
+<p><code>PATCH /api/messages/:id.json</code> returns <code>200 OK</code> with <code>{}</code>. A message that does not exist or was not sent to you returns <code>404</code> with <code>{ "error": "Not found" }</code>.</p>
+
+<hr>
+
+<h2 id="push-subscriptions">Push Subscriptions</h2>
+<p>Register APNs device tokens for server-sent push notifications. Request bodies are top-level JSON.</p>
+
+<h3>Endpoints</h3>
+<table>
+  <thead>
+    <tr><th>Method</th><th>Path</th><th>Description</th><th>Permission</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>POST</td><td><code>/api/push_subscriptions.json</code></td><td>Register a token or update its preferences (upsert by token)</td><td>Any authenticated user</td></tr>
+    <tr><td>DELETE</td><td><code>/api/push_subscriptions/:token.json</code></td><td>Remove a token (idempotent, always <code>200</code>)</td><td>Any authenticated user</td></tr>
+  </tbody>
+</table>
+
+<h3>Register / update</h3>
+<pre><code>POST /api/push_subscriptions.json
+Content-Type: application/json
+
+{
+  "token": "a1b2c3d4e5f6...",
+  "platform": "ios",
+  "messages": true,
+  "todos": false,
+  "forum": false,
+  "news": true
+}</code></pre>
+<p><code>platform</code> defaults to <code>"ios"</code>. Each category is enabled only if sent as the JSON boolean <code>true</code>; missing values or the string <code>"true"</code> disable it. Every call overwrites all four preferences and assigns the token to the calling user. Returns <code>200 OK</code> with <code>{}</code>, or <code>422</code> with <code>{ "errors": [...] }</code>.</p>
+
+<h3>Notification payloads</h3>
+<p>Payloads contain no personal data: alert title is always <code>"PIRATEN App"</code>, the body a fixed German text. <code>badge</code> is the recipient's number of unread messages.</p>
+<table>
+  <thead>
+    <tr><th>Trigger</th><th>Category</th><th>Alert body</th><th>Extra keys</th><th>Recipients</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>New message</td><td><code>messages</code></td><td>Du hast eine neue Nachricht</td><td><code>deepLink: "message"</code>, <code>topicId</code> (message id)</td><td>The recipient</td></tr>
+    <tr><td>Task created, or its status / assignee changed</td><td><code>todos</code></td><td>Ein ToDo wurde aktualisiert</td><td><code>deepLink: "todo"</code>, <code>todoId</code></td><td>The assignee, or all <code>todos</code> subscribers if the task has no assignee</td></tr>
+    <tr><td>New Telegram news post</td><td><code>news</code></td><td>Es gibt neue Neuigkeiten</td><td><code>deepLink: "forum"</code></td><td>All <code>news</code> subscribers</td></tr>
+  </tbody>
+</table>
+<p>The <code>forum</code> category can be stored but nothing on the server sends forum notifications.</p>

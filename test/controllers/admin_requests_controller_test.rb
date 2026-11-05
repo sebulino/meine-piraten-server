@@ -4,6 +4,8 @@ class AdminRequestsControllerTest < ActionDispatch::IntegrationTest
   # -- Create (JSON API) --
 
   test "POST /admin_requests.json as authenticated user returns 201" do
+    admin_requests(:pending_request).destroy
+
     assert_difference("AdminRequest.count") do
       post admin_requests_url(format: :json),
         params: { reason: "Ich möchte Admin werden." },
@@ -14,6 +16,41 @@ class AdminRequestsControllerTest < ActionDispatch::IntegrationTest
     json = JSON.parse(response.body)
     assert_equal "pending", json["status"]
     assert_equal "Ich möchte Admin werden.", json["reason"]
+  end
+
+  test "POST /admin_requests.json with an already pending request returns 422" do
+    assert_no_difference("AdminRequest.count") do
+      post admin_requests_url(format: :json),
+        params: { reason: "Nochmal gefragt." },
+        headers: regular_auth_headers
+    end
+
+    assert_response :unprocessable_entity
+    assert_includes JSON.parse(response.body)["errors"], "Es liegt bereits eine offene Anfrage vor."
+  end
+
+  # -- Status (JSON API) --
+
+  test "GET /admin_requests/status reports a pending request" do
+    get status_admin_requests_url(format: :json), headers: regular_auth_headers
+
+    assert_response :success
+    assert_equal({ "admin" => false, "pending_request" => true }, JSON.parse(response.body))
+  end
+
+  test "GET /admin_requests/status without pending request reports false" do
+    admin_requests(:pending_request).destroy
+    get status_admin_requests_url(format: :json), headers: regular_auth_headers
+
+    assert_response :success
+    assert_equal({ "admin" => false, "pending_request" => false }, JSON.parse(response.body))
+  end
+
+  test "GET /admin_requests/status as admin reports admin true" do
+    get status_admin_requests_url(format: :json), headers: admin_auth_headers
+
+    assert_response :success
+    assert_equal({ "admin" => true, "pending_request" => false }, JSON.parse(response.body))
   end
 
   test "POST /admin_requests.json without auth returns 401" do

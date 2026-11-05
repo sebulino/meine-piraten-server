@@ -2,8 +2,24 @@ require "test_helper"
 
 class AdminRequestTest < ActiveSupport::TestCase
   test "valid admin request" do
-    request = AdminRequest.new(user: users(:pirat), reason: "Ich brauche Admin-Rechte.")
+    request = AdminRequest.new(user: users(:admin_pirat), reason: "Ich brauche Admin-Rechte.")
     assert request.valid?
+  end
+
+  test "rejects a second pending request for the same user" do
+    request = AdminRequest.new(user: users(:pirat), reason: "Nochmal.")
+    assert_not request.valid?
+    assert_includes request.errors[:base], "Es liegt bereits eine offene Anfrage vor."
+  end
+
+  test "allows a new request once the previous one was reviewed" do
+    admin_requests(:pending_request).update!(status: "rejected")
+    request = AdminRequest.new(user: users(:pirat), reason: "Neuer Versuch.")
+    assert request.valid?
+  end
+
+  test "reviewing a pending request is not blocked by the uniqueness rule" do
+    assert admin_requests(:pending_request).update(status: "approved")
   end
 
   test "requires reason" do
