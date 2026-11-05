@@ -72,8 +72,9 @@ The app polls the Telegram channel "News-Kombüse" for new posts and exposes the
 | `TELEGRAM_AUTO_CLEAR_WEBHOOK` | No | — | Set to `true` to delete an active bot webhook, which otherwise blocks polling |
 
 **Scheduling:** in production, Solid Queue runs the jobs from `config/recurring.yml`:
-`TelegramPollJob` every 5 minutes and `ChannelPostsCleanupJob` daily at 3am. This needs a
-running Solid Queue worker (`SOLID_QUEUE_IN_PUMA=true` or a separate `bin/jobs` process).
+`TelegramPollJob` every 5 minutes and `ChannelPostsCleanupJob` daily at 3am. Production runs
+Solid Queue inside Puma via `SOLID_QUEUE_IN_PUMA=true` in the container environment; without
+it (and without a separate `bin/jobs` process) no jobs run at all.
 
 **Manual poll cycle** (debugging):
 
