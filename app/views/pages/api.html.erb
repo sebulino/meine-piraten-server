@@ -362,7 +362,8 @@ grant_type=client_credentials
 <pre><code>GET /admin_requests/status.json
 Authorization: Bearer eyJhbG...</code></pre>
 <p>Returns:</p>
-<pre><code>{ "admin": true }</code></pre>
+<pre><code>{ "admin": false, "pending_request": true }</code></pre>
+<p><code>pending_request</code> is <code>true</code> while you have a request awaiting review. Hide the request form in that case.</p>
 
 <h3>Submit a request</h3>
 <p>Send the <code>reason</code> as a top-level parameter:</p>
@@ -386,6 +387,7 @@ Content-Type: application/json
 <pre><code>{
   "errors": ["Reason can't be blank"]
 }</code></pre>
+<p>Only one pending request per user is allowed. A second submission returns 422 with <code>"Es liegt bereits eine offene Anfrage vor."</code> A new request is possible once the previous one was approved or rejected.</p>
 
 <h3>Approve / Reject / Demote (superadmin only)</h3>
 <pre><code>PATCH /admin_requests/1/approve.json
