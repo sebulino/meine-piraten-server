@@ -27,17 +27,34 @@ Task management and team coordination platform for the Piratenpartei (Pirate Par
 ### Authorization & Roles
 - **Regular users** — view tasks/entities/categories, claim tasks, add comments, request admin access
 - **Admins** — create/edit/delete tasks, entities, categories; manage comments; confirm task completion
-- **Superadmins** — review, approve, or reject admin access requests (approving grants admin privileges)
+- **Superadmins** — review, approve, or reject admin access requests (approving grants admin privileges) and revoke admin rights again (demote)
 
 ### Admin Request Workflow
-- Users submit admin access requests with a reason via the JSON API (`POST /admin_requests.json`)
+- Users submit admin access requests with a reason via the JSON API (`POST /admin_requests.json`); only one pending request per user
+- `GET /admin_requests/status.json` tells the app whether the user is admin and whether a request is pending
 - Superadmins review requests in a dedicated web view and approve or reject them
-- Approval automatically grants admin rights to the requesting user
+- Approval automatically grants admin rights to the requesting user; demote revokes them
+
+### Private Messages & Push Notifications
+- Users can send each other private messages via the JSON API (`/api/messages`)
+- Devices register APNs tokens with per-category preferences (`/api/push_subscriptions`)
+- The server sends pushes for new messages, task changes and new news posts (`PushNotificationJob` → `ApnsDeliveryService`)
+- The iOS app v1 does not use these endpoints yet: it uses Discourse for private messages and polling with local notifications (iOS ADR-0006)
+
+**APNs environment variables** (required as soon as a push is actually sent):
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `APNS_KEY_PATH` | Yes | — | Path to the `.p8` signing key |
+| `APNS_KEY_ID` | Yes | — | Key ID of the `.p8` key |
+| `APNS_TEAM_ID` | Yes | — | Apple Developer Team ID |
+| `APNS_BUNDLE_ID` | Yes | — | App bundle ID (APNs topic) |
+| `APNS_ENVIRONMENT` | No | `production` | Anything else uses the APNs sandbox |
 
 ### JSON API
-- Full REST API for tasks and comments (used by the iOS app)
-- API documentation available at `/api` in the web UI
-- Endpoints: tasks (CRUD), comments (list/create/delete), admin requests (create)
+- REST API used by the iOS app
+- Endpoints: tasks, comments, entities, categories, news (public), admin requests, messages, push subscriptions
+- The full reference is the `/api` page of the app (source: `app/views/pages/api.html.erb`)
 
 ### Telegram News Channel (News-Kombüse)
 
@@ -48,17 +65,21 @@ The app polls the Telegram channel "News-Kombüse" for new posts and exposes the
 | Variable | Required | Default | Description |
 |---|---|---|---|
 | `TELEGRAM_BOT_TOKEN` | Yes | — | Bot API token (from @BotFather) |
+| `TELEGRAM_CHAT_ID` | Yes | — | Numeric ID of the channel to import (e.g. `-1001234567890`) |
 | `TELEGRAM_POLL_TIMEOUT` | No | `30` | Long-poll timeout in seconds |
 | `TELEGRAM_ALLOWED_UPDATES` | No | `["channel_post","edited_channel_post"]` | Update types to subscribe to |
 | `TELEGRAM_POLL_ENABLED` | No | `true` | Set to `false` to disable polling |
+| `TELEGRAM_AUTO_CLEAR_WEBHOOK` | No | — | Set to `true` to delete an active bot webhook, which otherwise blocks polling |
 
-**Running the poller:**
+**Scheduling:** in production, Solid Queue runs the jobs from `config/recurring.yml`:
+`TelegramPollJob` every 5 minutes and `ChannelPostsCleanupJob` daily at 3am. This needs a
+running Solid Queue worker (`SOLID_QUEUE_IN_PUMA=true` or a separate `bin/jobs` process).
+
+**Manual poll cycle** (debugging):
 
 ```sh
-# Single poll cycle (use with cron / systemd timer / k8s CronJob):
 bin/rails runner 'puts Telegram::ChannelPoller.new.poll_once'
-
-# Or via the job wrapper:
+# or via the job wrapper:
 bin/rails runner 'TelegramPollJob.perform_now'
 ```
 
@@ -95,7 +116,7 @@ app.response.body
 - **Database:** SQLite 3
 - **Authentication:** Devise + omniauth_openid_connect + JWT
 - **Frontend:** Hotwire (Turbo + Stimulus), importmap-rails, Propshaft
-- **Deployment:** Kamal (Docker-based)
+- **Deployment:** Docker image built by GitHub Actions, run with Docker Compose (see [Deployment](#deployment))
 - **Background jobs:** Solid Queue
 - **Caching:** Solid Cache
 - **WebSockets:** Solid Cable
@@ -138,11 +159,25 @@ bin/rails test:system   # browser tests (headless Chrome)
 ```
 
 CI (`.github/workflows/ci.yml`) runs lint, security scans, both test suites
-and a Docker build/boot smoke test on every pull request.
+and a Docker build/boot smoke test on every pull request, on every push to `main`
+and once a day (so newly published security advisories fail the build).
+
+### Deployment
+
+Every push to `main` runs `.github/workflows/build-and-deploy.yml`. It bumps the
+version tag (patch by default, `[minor]` / `[major]` in the commit message for
+larger bumps) and pushes the image to Docker Hub as
+`sebulino/meine-piraten-server:latest`, `:<version>` and `:v<major>`.
+
+The workflow does **not** restart production. Pull the new image and restart the
+container on the server (Docker Compose, compose file not part of this repo).
+
+`config/deploy.yml` is a Kamal configuration that is not used for the current
+deployment; it lacks the required `KEYCLOAK_CLIENT_SECRET`, Telegram and APNs variables.
 
 ### API Authentication
 
-Obtain a JWT from PiratenSSO and include it in requests:
+Sign the user in via PiratenSSO (Authorization Code flow with PKCE) and send the access token with each request:
 
 ```sh
 curl -H "Authorization: Bearer <token>" \
